@@ -6,13 +6,13 @@
 
 ## 中文
 
-感谢你对 Namio.World 项目的关注！我们欢迎所有形式的贡献。
+感谢你对 Nomio.World 项目的关注！我们欢迎所有形式的贡献。
 
 ### 如何贡献
 
 #### 报告 Bug
 
-1. 在 [Issues](https://github.com/your-org/namio-world/issues) 中搜索是否已有相同问题
+1. 在 [Issues](https://github.com/your-org/nomio-world/issues) 中搜索是否已有相同问题
 2. 如果没有，使用 **Bug Report** 模板创建新 Issue
 3. 请包含以下信息：
    - 问题描述
@@ -92,8 +92,8 @@ test(auth): add login failure tests
 
 ```bash
 # 克隆仓库
-git clone https://github.com/your-org/namio-world.git
-cd namio-world
+git clone https://github.com/your-org/nomio-world.git
+cd nomio-world
 
 # 安装依赖
 cd workers/api && npm install && cd ../..
@@ -123,13 +123,13 @@ schema.sql         -- 数据库 Schema
 
 ## English
 
-Thank you for your interest in the Namio.World project! We welcome all forms of contribution.
+Thank you for your interest in the Nomio.World project! We welcome all forms of contribution.
 
 ### How to Contribute
 
 #### Reporting Bugs
 
-1. Search [Issues](https://github.com/your-org/namio-world/issues) for existing reports
+1. Search [Issues](https://github.com/your-org/nomio-world/issues) for existing reports
 2. If none exists, create a new Issue using the **Bug Report** template
 3. Include:
    - Description of the problem
@@ -189,5 +189,5 @@ Use [Conventional Commits](https://www.conventionalcommits.org/) format:
 ### Getting Help
 
 - Read the [Technical Documentation](docs.md)
-- Open a [Discussion](https://github.com/your-org/namio-world/discussions)
-- Report a [Bug](https://github.com/your-org/namio-world/issues/new?template=bug_report.md)
+- Open a [Discussion](https://github.com/your-org/nomio-world/discussions)
+- Report a [Bug](https://github.com/your-org/nomio-world/issues/new?template=bug_report.md)

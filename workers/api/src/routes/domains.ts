@@ -98,7 +98,7 @@ domainRoutes.post('/verify', async (c) => {
   }
 
   // 发起验证请求
-  const verifyUrl = `${user.origin_url.replace(/\/$/, '')}/.well-known/namio-verify.txt`;
+  const verifyUrl = `${user.origin_url.replace(/\/$/, '')}/.well-known/nomio-verify.txt`;
 
   try {
     const resp = await fetch(verifyUrl, {
@@ -116,7 +116,7 @@ domainRoutes.post('/verify', async (c) => {
     }
 
     const content = await resp.text();
-    const expected = `namio-verify=${user.verify_token}`;
+    const expected = `nomio-verify=${user.verify_token}`;
 
     if (content.trim() === expected) {
       await c.env.DB.prepare(

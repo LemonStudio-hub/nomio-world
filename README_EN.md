@@ -1,6 +1,6 @@
 <div align="center">
 
-# Namio.World
+# Nomio.World
 
 **Public Digital Identity Infrastructure -- Gateway for Domains and Email**
 
@@ -18,12 +18,12 @@
 
 ## Introduction
 
-Namio.World is a **public digital identity infrastructure** built on Cloudflare's edge computing platform, providing two core capabilities:
+Nomio.World is a **public digital identity infrastructure** built on Cloudflare's edge computing platform, providing two core capabilities:
 
-- **Subdomain Distribution** -- Get a free `username.namio.world` domain, reverse-proxied to your HTTPS origin server via our edge gateway
-- **Email Hosting** -- Automatically receive a `username@namio.world` email address with plain-text email reception and storage
+- **Subdomain Distribution** -- Get a free `username.nomio.world` domain, reverse-proxied to your HTTPS origin server via our edge gateway
+- **Email Hosting** -- Automatically receive a `username@nomio.world` email address with plain-text email reception and storage
 
-> **Namio** = Name + I/O -- "The gateway for names, input and output"
+> **Nomio** = Name + I/O -- "The gateway for names, input and output"
 
 ## Features
 
@@ -58,8 +58,8 @@ Namio.World is a **public digital identity infrastructure** built on Cloudflare'
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/namio-world.git
-cd namio-world
+git clone https://github.com/your-org/nomio-world.git
+cd nomio-world
 
 # Install dependencies
 cd workers/api && npm install && cd ../..
@@ -96,7 +96,7 @@ See [Deployment Guide](docs.md#6-quick-deploy-one-click-script) for details.
 ## Project Structure
 
 ```
-namio/
+nomio/
 ├── workers/
 │   ├── api/                    # Hono API backend (14 endpoints)
 │   │   ├── src/
@@ -165,7 +165,7 @@ We welcome all forms of contribution! Please read the [Contributing Guide](CONTR
 This project is licensed under the [GNU Affero General Public License v3.0](LICENSE).
 
 ```
-Copyright (C) 2026 Namio.World Contributors
+Copyright (C) 2026 Nomio.World Contributors
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -188,6 +188,6 @@ by the Free Software Foundation, either version 3 of the License, or
 
 **[English](#)** | [中文](README.md) | [Documentation](docs.md) | [Changelog](CHANGELOG.md)
 
-Made by Namio.World Contributors
+Made by Nomio.World Contributors
 
 </div>

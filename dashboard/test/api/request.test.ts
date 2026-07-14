@@ -37,7 +37,7 @@ describe('request', () => {
   });
 
   it('onRequest 从 localStorage 读取 Token 并注入', async () => {
-    localStorage.setItem('namio_token', 'my-jwt-token');
+    localStorage.setItem('nomio_token', 'my-jwt-token');
     await import('@/api/request');
 
     const options = { headers: {} as any };
@@ -56,7 +56,7 @@ describe('request', () => {
   });
 
   it('onResponseError 401 时清除 Token', async () => {
-    localStorage.setItem('namio_token', 'expired-token');
+    localStorage.setItem('nomio_token', 'expired-token');
     await import('@/api/request');
 
     const originalLocation = window.location;
@@ -67,7 +67,7 @@ describe('request', () => {
 
     onResponseErrorHandler({ response: { status: 401 } });
 
-    expect(localStorage.getItem('namio_token')).toBeNull();
+    expect(localStorage.getItem('nomio_token')).toBeNull();
 
     // @ts-ignore
     window.location = originalLocation;

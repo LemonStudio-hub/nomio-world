@@ -10,7 +10,7 @@ import { createMockD1, createTestToken, createRequest, jsonBody, TEST_USER, TEST
 
 const ENV = {
   JWT_SECRET: 'test-secret-key-for-testing',
-  ALLOWED_ORIGINS: 'https://namio.world',
+  ALLOWED_ORIGINS: 'https://nomio.world',
 } as any;
 
 function createTestApp(db: ReturnType<typeof createMockD1>) {

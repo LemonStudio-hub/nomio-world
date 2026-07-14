@@ -11,7 +11,7 @@ import { hashPassword } from '../../src/utils/password';
 
 const ENV = {
   JWT_SECRET: 'test-secret-key-for-testing',
-  ALLOWED_ORIGINS: 'https://namio.world,https://www.namio.world',
+  ALLOWED_ORIGINS: 'https://nomio.world,https://www.nomio.world',
 } as any;
 
 function createTestApp(db: ReturnType<typeof createMockD1>) {

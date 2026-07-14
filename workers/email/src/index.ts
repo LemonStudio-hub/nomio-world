@@ -1,5 +1,5 @@
 /**
- * Namio Email Worker
+ * Nomio Email Worker
  * 接收入站邮件，解析纯文本，存储到 D1，可选转发
  */
 

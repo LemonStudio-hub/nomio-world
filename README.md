@@ -1,6 +1,6 @@
 <div align="center">
 
-# Namio.World
+# Nomio.World
 
 **公益数字身份基建服务 -- 域名与邮箱的入口**
 
@@ -18,12 +18,12 @@
 
 ## 简介
 
-Namio.World 是一个基于 Cloudflare 边缘计算平台的**公益数字身份基建服务**，为用户提供两大核心能力：
+Nomio.World 是一个基于 Cloudflare 边缘计算平台的**公益数字身份基建服务**，为用户提供两大核心能力：
 
-- **二级域名分发** -- 免费申请 `username.namio.world`，通过边缘网关反向代理到你的 HTTPS 源站
-- **邮箱托管服务** -- 自动获得 `username@namio.world` 邮箱，支持纯文本邮件接收与存储
+- **二级域名分发** -- 免费申请 `username.nomio.world`，通过边缘网关反向代理到你的 HTTPS 源站
+- **邮箱托管服务** -- 自动获得 `username@nomio.world` 邮箱，支持纯文本邮件接收与存储
 
-> **Namio** = Name + I/O，寓意"域名与邮箱的入口服务"
+> **Nomio** = Name + I/O，寓意"域名与邮箱的入口服务"
 
 ## 特性
 
@@ -58,8 +58,8 @@ Namio.World 是一个基于 Cloudflare 边缘计算平台的**公益数字身份
 
 ```bash
 # 克隆仓库
-git clone https://github.com/your-org/namio-world.git
-cd namio-world
+git clone https://github.com/your-org/nomio-world.git
+cd nomio-world
 
 # 安装依赖
 cd workers/api && npm install && cd ../..
@@ -96,7 +96,7 @@ wrangler login
 ## 项目结构
 
 ```
-namio/
+nomio/
 ├── workers/
 │   ├── api/                    # Hono API 后端（14 个接口）
 │   │   ├── src/
@@ -165,7 +165,7 @@ cd dashboard && npx vitest run --coverage
 本项目采用 [GNU Affero General Public License v3.0](LICENSE) 开源。
 
 ```
-Copyright (C) 2026 Namio.World Contributors
+Copyright (C) 2026 Nomio.World Contributors
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -188,6 +188,6 @@ by the Free Software Foundation, either version 3 of the License, or
 
 **[English](README_EN.md)** | [技术文档](docs.md) | [更新日志](CHANGELOG.md)
 
-Made by Namio.World Contributors
+Made by Nomio.World Contributors
 
 </div>

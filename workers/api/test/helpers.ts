@@ -220,7 +220,7 @@ export function createRequest(
   options: RequestInit & { token?: string } = {},
 ): Request {
   const { token, ...init } = options;
-  const url = `https://namio.world${path}`;
+  const url = `https://nomio.world${path}`;
 
   const headers = new Headers(init.headers);
   if (token) {

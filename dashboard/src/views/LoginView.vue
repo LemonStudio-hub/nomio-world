@@ -25,7 +25,7 @@ async function handleSubmit() {
 <template>
   <div class="auth-container">
     <div class="auth-card">
-      <div class="logo">Namio.World</div>
+      <div class="logo"><span>Nomio</span>.World</div>
       <p class="subtitle">登录你的账号</p>
 
       <div v-if="error" class="alert alert-error">{{ error }}</div>

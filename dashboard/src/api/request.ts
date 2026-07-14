@@ -13,7 +13,7 @@ const request = ofetch.create({
   },
   onRequest({ options }) {
     // 从 localStorage 读取 Token
-    const token = localStorage.getItem('namio_token');
+    const token = localStorage.getItem('nomio_token');
     if (token) {
       options.headers = {
         ...options.headers,
@@ -24,7 +24,7 @@ const request = ofetch.create({
   onResponseError({ response }) {
     // 401 → 清除 Token，跳转登录
     if (response.status === 401) {
-      localStorage.removeItem('namio_token');
+      localStorage.removeItem('nomio_token');
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }

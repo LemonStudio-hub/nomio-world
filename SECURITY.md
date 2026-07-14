@@ -17,7 +17,7 @@
 
 如果你发现安全漏洞，请**不要**通过公开 Issue 报告。请通过以下方式联系我们：
 
-**邮箱：** security@namio.world
+**邮箱：** security@nomio.world
 
 **报告内容应包括：**
 - 漏洞描述
@@ -75,7 +75,7 @@
 
 If you discover a security vulnerability, please **do NOT** report it through a public Issue. Contact us via:
 
-**Email:** security@namio.world
+**Email:** security@nomio.world
 
 **Report should include:**
 - Vulnerability description

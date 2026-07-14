@@ -148,7 +148,7 @@ describe('Email Worker - 邮件接收', () => {
     const env = createMockEnv([
       { id: 1, username: 'alice', total_mail_size: 0, forward_email: null, status: 'active', email_enabled: 1 },
     ]);
-    const message = createMockMessage('alice@namio.world');
+    const message = createMockMessage('alice@nomio.world');
     await worker.email(message, env as any, {} as any);
     expect(message.setReject).not.toHaveBeenCalled();
     expect(env.DB._getMailStore().length).toBe(1);
@@ -156,7 +156,7 @@ describe('Email Worker - 邮件接收', () => {
 
   it('拒绝发给不存在用户的邮件', async () => {
     const env = createMockEnv([]);
-    const message = createMockMessage('nobody@namio.world');
+    const message = createMockMessage('nobody@nomio.world');
     await worker.email(message, env as any, {} as any);
     expect(message.setReject).toHaveBeenCalledWith('User not found');
   });
@@ -165,7 +165,7 @@ describe('Email Worker - 邮件接收', () => {
     const env = createMockEnv([
       { id: 1, username: 'alice', total_mail_size: 0, forward_email: null, status: 'frozen', email_enabled: 1 },
     ]);
-    const message = createMockMessage('alice@namio.world');
+    const message = createMockMessage('alice@nomio.world');
     await worker.email(message, env as any, {} as any);
     expect(message.setReject).toHaveBeenCalledWith('User not found');
   });
@@ -174,7 +174,7 @@ describe('Email Worker - 邮件接收', () => {
     const env = createMockEnv([
       { id: 1, username: 'alice', total_mail_size: 0, forward_email: null, status: 'active', email_enabled: 0 },
     ]);
-    const message = createMockMessage('alice@namio.world');
+    const message = createMockMessage('alice@nomio.world');
     await worker.email(message, env as any, {} as any);
     expect(message.setReject).toHaveBeenCalledWith('User not found');
   });
@@ -183,7 +183,7 @@ describe('Email Worker - 邮件接收', () => {
     const env = createMockEnv([
       { id: 1, username: 'alice', total_mail_size: 0, forward_email: null, status: 'active', email_enabled: 1 },
     ]);
-    const message = createMockMessage('ALICE@namio.world');
+    const message = createMockMessage('ALICE@nomio.world');
     await worker.email(message, env as any, {} as any);
     expect(message.setReject).not.toHaveBeenCalled();
   });
@@ -192,7 +192,7 @@ describe('Email Worker - 邮件接收', () => {
     const env = createMockEnv([
       { id: 1, username: 'alice', total_mail_size: 0, forward_email: null, status: 'active', email_enabled: 1 },
     ]);
-    const message = createMockMessage('alice@namio.world', 'bob@example.com');
+    const message = createMockMessage('alice@nomio.world', 'bob@example.com');
     await worker.email(message, env as any, {} as any);
     const mails = env.DB._getMailStore();
     expect(mails.length).toBe(1);
@@ -205,7 +205,7 @@ describe('Email Worker - 邮件接收', () => {
     const env = createMockEnv([
       { id: 1, username: 'alice', total_mail_size: 0, forward_email: null, status: 'active', email_enabled: 1 },
     ]);
-    const message = createMockMessage('alice@namio.world');
+    const message = createMockMessage('alice@nomio.world');
     await worker.email(message, env as any, {} as any);
     const user = env.DB._getUserStore().find((u) => u.username === 'alice');
     expect(user?.total_mail_size).toBeGreaterThan(0);
@@ -226,7 +226,7 @@ describe('Email Worker - 邮件接收', () => {
   it('处理超过 63 字符的用户名', async () => {
     const env = createMockEnv([]);
     const longName = 'a'.repeat(64);
-    const message = createMockMessage(`${longName}@namio.world`);
+    const message = createMockMessage(`${longName}@nomio.world`);
     await worker.email(message, env as any, {} as any);
     expect(message.setReject).toHaveBeenCalledWith('Invalid recipient');
   });
@@ -238,10 +238,10 @@ describe('Email Worker - 频率限制', () => {
       { id: 1, username: 'alice', total_mail_size: 0, forward_email: null, status: 'active', email_enabled: 1 },
     ]);
     for (let i = 0; i < 3; i++) {
-      const message = createMockMessage('alice@namio.world', 'spammer@example.com');
+      const message = createMockMessage('alice@nomio.world', 'spammer@example.com');
       await worker.email(message, env as any, {} as any);
     }
-    const message4 = createMockMessage('alice@namio.world', 'spammer@example.com');
+    const message4 = createMockMessage('alice@nomio.world', 'spammer@example.com');
     await worker.email(message4, env as any, {} as any);
     expect(message4.setReject).not.toHaveBeenCalled();
     expect(env.DB._getMailStore().length).toBe(3);
@@ -257,7 +257,7 @@ describe('Email Worker - 配额清理', () => {
       { user_id: 1, from_address: 'a@b.com', subject: 'old', body: 'x'.repeat(1000), size: 1000 },
       { user_id: 1, from_address: 'a@b.com', subject: 'old2', body: 'x'.repeat(1000), size: 1000 },
     );
-    const message = createMockMessage('alice@namio.world');
+    const message = createMockMessage('alice@nomio.world');
     await worker.email(message, env as any, {} as any);
     expect(message.setReject).not.toHaveBeenCalled();
   });

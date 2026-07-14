@@ -1,4 +1,4 @@
--- Namio.World D1 Database Schema
+-- Nomio.World D1 Database Schema
 -- 数据库初始化脚本
 
 -- ============================================================

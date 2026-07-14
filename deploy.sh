@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================
-# Namio.World 一键部署脚本
+# Nomio.World 一键部署脚本
 # 用法: ./deploy.sh [all|db|api|gateway|email|dashboard]
 # ============================================================
 
@@ -68,11 +68,11 @@ create_database() {
   info "创建 D1 数据库..."
 
   # 检查是否已存在
-  if wrangler d1 list 2>/dev/null | grep -q "namio-db"; then
-    warn "数据库 namio-db 已存在，跳过创建"
-    DB_ID=$(wrangler d1 list 2>/dev/null | grep "namio-db" | awk '{print $2}')
+  if wrangler d1 list 2>/dev/null | grep -q "nomio-db"; then
+    warn "数据库 nomio-db 已存在，跳过创建"
+    DB_ID=$(wrangler d1 list 2>/dev/null | grep "nomio-db" | awk '{print $2}')
   else
-    OUTPUT=$(wrangler d1 create namio-db 2>&1)
+    OUTPUT=$(wrangler d1 create nomio-db 2>&1)
     echo "$OUTPUT"
     # 从输出中提取 database_id
     DB_ID=$(echo "$OUTPUT" | grep -oP 'database_id = "\K[^"]+' || echo "")
@@ -93,7 +93,7 @@ create_database() {
 
   # 初始化 schema
   info "初始化数据库表结构..."
-  wrangler d1 execute namio-db --file="$ROOT/schema.sql"
+  wrangler d1 execute nomio-db --file="$ROOT/schema.sql"
   ok "数据库表结构初始化完成"
 }
 
@@ -155,7 +155,7 @@ deploy_dashboard() {
   ok "构建完成"
 
   info "部署到 Cloudflare Pages..."
-  npx wrangler pages deploy dist --project-name=namio-dashboard
+  npx wrangler pages deploy dist --project-name=nomio-dashboard
   ok "Dashboard 部署完成"
   cd "$ROOT"
 }
@@ -217,7 +217,7 @@ post_deploy_check() {
   info "部署后验证..."
 
   # 尝试访问 API
-  local API_URL="https://namio.world/api/auth/me"
+  local API_URL="https://nomio.world/api/auth/me"
   if curl -s -o /dev/null -w "%{http_code}" "$API_URL" 2>/dev/null | grep -q "401"; then
     ok "API Worker 响应正常 (401 = 未认证，符合预期)"
   else
@@ -231,10 +231,10 @@ post_deploy_check() {
   echo ""
   info "接下来需要手动完成："
   info "  1. 在 Cloudflare Dashboard 配置 DNS:"
-  info "     - A 记录: *.namio.world → Cloudflare (橙色云)"
-  info "     - MX 记录: namio.world → route.mx.cloudflare.net"
+  info "     - A 记录: *.nomio.world → Cloudflare (橙色云)"
+  info "     - MX 记录: nomio.world → route.mx.cloudflare.net"
   info "  2. 在 Email Routing 中配置 Catch-all → Email Worker"
-  info "  3. 访问 https://namio-dashboard.pages.dev 查看前端"
+  info "  3. 访问 https://nomio-dashboard.pages.dev 查看前端"
   echo ""
 }
 
@@ -246,7 +246,7 @@ main() {
 
   echo ""
   info "=========================================="
-  info "  Namio.World 部署工具"
+  info "  Nomio.World 部署工具"
   info "  目标: $TARGET"
   info "=========================================="
   echo ""

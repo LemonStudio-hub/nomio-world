@@ -31,7 +31,7 @@ settingsRoutes.get('/email', async (c) => {
   }
 
   return success(c, {
-    email: `${username}@namio.world`,
+    email: `${username}@nomio.world`,
     forwardEmail: user.forward_email,
     emailEnabled: !!user.email_enabled,
     totalMailSize: user.total_mail_size,
@@ -93,7 +93,7 @@ settingsRoutes.put('/email', async (c) => {
     .first();
 
   return success(c, {
-    email: `${username}@namio.world`,
+    email: `${username}@nomio.world`,
     forwardEmail: user!.forward_email,
     emailEnabled: !!user!.email_enabled,
   });

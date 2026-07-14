@@ -21,7 +21,7 @@ check_warn() { echo -e "  ${YELLOW}[WARN]${NC} $1"; ((WARN++)); }
 
 echo ""
 echo "=========================================="
-echo "  Namio.World 部署前检查"
+echo "  Nomio.World 部署前检查"
 echo "=========================================="
 echo ""
 

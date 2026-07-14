@@ -42,7 +42,7 @@ describe('useAuthStore', () => {
     });
 
     it('有 Token 时 isLoggedIn 为 true', () => {
-      localStorage.setItem('namio_token', 'existing-token');
+      localStorage.setItem('nomio_token', 'existing-token');
       const store = useAuthStore();
       expect(store.token).toBe('existing-token');
       expect(store.isLoggedIn).toBe(true);
@@ -67,7 +67,7 @@ describe('useAuthStore', () => {
 
       expect(store.token).toBe('new-jwt-token');
       expect(store.isLoggedIn).toBe(true);
-      expect(localStorage.getItem('namio_token')).toBe('new-jwt-token');
+      expect(localStorage.getItem('nomio_token')).toBe('new-jwt-token');
       expect(store.user).toEqual(mockUser);
     });
 
@@ -130,7 +130,7 @@ describe('useAuthStore', () => {
 
       expect(store.token).toBe('reg-token');
       expect(store.isLoggedIn).toBe(true);
-      expect(localStorage.getItem('namio_token')).toBe('reg-token');
+      expect(localStorage.getItem('nomio_token')).toBe('reg-token');
     });
 
     it('注册后跳转到 /dashboard', async () => {
@@ -150,7 +150,7 @@ describe('useAuthStore', () => {
   // ---- logout ----
   describe('logout', () => {
     it('清除 token 和 user', () => {
-      localStorage.setItem('namio_token', 'old-token');
+      localStorage.setItem('nomio_token', 'old-token');
 
       const store = useAuthStore();
       store.token = 'old-token';
@@ -158,7 +158,7 @@ describe('useAuthStore', () => {
 
       expect(store.token).toBeNull();
       expect(store.user).toBeNull();
-      expect(localStorage.getItem('namio_token')).toBeNull();
+      expect(localStorage.getItem('nomio_token')).toBeNull();
     });
 
     it('跳转到 /login', () => {
@@ -171,7 +171,7 @@ describe('useAuthStore', () => {
   // ---- fetchUser ----
   describe('fetchUser', () => {
     it('成功获取用户信息', async () => {
-      localStorage.setItem('namio_token', 'valid-token');
+      localStorage.setItem('nomio_token', 'valid-token');
       const mockUser = { username: 'alice', origin_url: 'https://a.com' };
       vi.mocked(getMe).mockResolvedValue({ success: true, data: mockUser } as any);
 
@@ -182,7 +182,7 @@ describe('useAuthStore', () => {
     });
 
     it('获取失败时登出', async () => {
-      localStorage.setItem('namio_token', 'invalid-token');
+      localStorage.setItem('nomio_token', 'invalid-token');
       vi.mocked(getMe).mockRejectedValue(new Error('Unauthorized'));
 
       const store = useAuthStore();

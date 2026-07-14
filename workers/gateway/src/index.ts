@@ -1,5 +1,5 @@
 /**
- * Namio Gateway Worker
+ * Nomio Gateway Worker
  * Hono 反向代理网关：将子域名请求转发到用户源站
  */
 

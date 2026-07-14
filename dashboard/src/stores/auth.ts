@@ -9,7 +9,7 @@ import type { UserProfile } from '@/api/auth';
 import router from '@/router';
 
 export const useAuthStore = defineStore('auth', () => {
-  const token = ref<string | null>(localStorage.getItem('namio_token'));
+  const token = ref<string | null>(localStorage.getItem('nomio_token'));
   const user = ref<UserProfile | null>(null);
   const loading = ref(false);
 
@@ -21,7 +21,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const res = await apiLogin({ username, password });
       token.value = res.data.token;
-      localStorage.setItem('namio_token', res.data.token);
+      localStorage.setItem('nomio_token', res.data.token);
       await fetchUser();
       router.push('/dashboard');
     } finally {
@@ -34,7 +34,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const res = await apiRegister({ username, password, originUrl });
       token.value = res.data.token;
-      localStorage.setItem('namio_token', res.data.token);
+      localStorage.setItem('nomio_token', res.data.token);
       await fetchUser();
       router.push('/dashboard');
     } finally {
@@ -55,7 +55,7 @@ export const useAuthStore = defineStore('auth', () => {
   function logout() {
     token.value = null;
     user.value = null;
-    localStorage.removeItem('namio_token');
+    localStorage.removeItem('nomio_token');
     router.push('/login');
   }
 

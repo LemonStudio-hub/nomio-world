@@ -1,12 +1,12 @@
-name = "namio-email"
+name = "nomio-email"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
 [[d1_databases]]
 binding = "DB"
-database_name = "namio-db"
-database_id = "<your-database-id>"
+database_name = "nomio-db"
+database_id = "f0616555-1157-4062-b9ef-f27d56831d02"
 
 [vars]
 MAX_MAIL_SIZE = "5242880"

@@ -64,7 +64,7 @@ async function handleVerify() {
       domain.value.verify_status = res.data.verifyStatus;
     }
     if (res.data.verifyStatus === 'verified') {
-      successMsg.value = '源站验证通过！';
+      successMsg.value = '源站验证通过';
     } else {
       error.value = '源站验证失败，请确保验证文件已正确部署';
     }
@@ -91,28 +91,23 @@ async function handleVerify() {
       <div v-if="error" class="alert alert-error">{{ error }}</div>
       <div v-if="successMsg" class="alert alert-success">{{ successMsg }}</div>
 
-      <!-- 域名信息 -->
       <div class="card">
         <div class="card-title">域名信息</div>
         <table>
           <tbody>
             <tr>
-              <td style="width: 140px; color: var(--color-text-secondary)">二级域名</td>
+              <td style="width: 120px; color: var(--color-text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em">二级域名</td>
               <td>
-                <a :href="`https://${auth.username}.namio.world`" target="_blank">
-                  {{ auth.username }}.namio.world
+                <a :href="`https://${auth.username}.nomio.world`" target="_blank">
+                  {{ auth.username }}.nomio.world
                 </a>
               </td>
             </tr>
             <tr>
-              <td style="color: var(--color-text-secondary)">验证状态</td>
+              <td style="color: var(--color-text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em">验证状态</td>
               <td>
-                <span v-if="domain?.verify_status === 'verified'" class="badge badge-success">
-                  已验证
-                </span>
-                <span v-else-if="domain?.verify_status === 'failed'" class="badge badge-danger">
-                  验证失败
-                </span>
+                <span v-if="domain?.verify_status === 'verified'" class="badge badge-success">已验证</span>
+                <span v-else-if="domain?.verify_status === 'failed'" class="badge badge-danger">验证失败</span>
                 <span v-else class="badge badge-warning">待验证</span>
               </td>
             </tr>
@@ -120,7 +115,6 @@ async function handleVerify() {
         </table>
       </div>
 
-      <!-- 源站配置 -->
       <div class="card">
         <div class="card-title">源站配置</div>
         <form @submit.prevent="handleSave">
@@ -153,30 +147,21 @@ async function handleVerify() {
         </form>
       </div>
 
-      <!-- 源站验证 -->
       <div class="card">
         <div class="card-title">源站验证</div>
-        <p style="font-size: 0.85rem; color: var(--color-text-secondary); margin-bottom: 16px">
+        <p style="font-size: 0.8125rem; color: var(--color-text-secondary); margin-bottom: 16px; line-height: 1.6">
           为防止恶意指向，需验证你对源站的所有权。请在源站部署以下验证文件：
         </p>
-        <div
-          style="
-            background: var(--color-bg);
-            padding: 12px 16px;
-            border-radius: var(--radius);
-            font-family: monospace;
-            font-size: 0.82rem;
-            margin-bottom: 16px;
-            word-break: break-all;
-          "
-        >
-          文件路径：{{ originUrl.replace(/\/$/, '') }}/.well-known/namio-verify.txt<br />
-          文件内容：namio-verify={{ domain?.verify_status === 'verified' ? '***' : '(注册时提供的 Token)' }}
+        <div class="code-block">
+          文件路径：{{ originUrl.replace(/\/$/, '') }}/.well-known/nomio-verify.txt<br />
+          文件内容：nomio-verify={{ domain?.verify_status === 'verified' ? '***' : '(注册时提供的 Token)' }}
         </div>
-        <button class="btn btn-outline" @click="handleVerify" :disabled="verifying">
-          <span v-if="verifying" class="spinner"></span>
-          <span v-else>验证源站</span>
-        </button>
+        <div style="margin-top: 16px">
+          <button class="btn btn-outline" @click="handleVerify" :disabled="verifying">
+            <span v-if="verifying" class="spinner"></span>
+            <span v-else>验证源站</span>
+          </button>
+        </div>
       </div>
     </template>
   </div>

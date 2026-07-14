@@ -41,7 +41,7 @@ async function handleSubmit() {
 <template>
   <div class="auth-container">
     <div class="auth-card">
-      <div class="logo">Namio.World</div>
+      <div class="logo"><span>Nomio</span>.World</div>
       <p class="subtitle">创建你的数字身份</p>
 
       <div v-if="error" class="alert alert-error">{{ error }}</div>
@@ -56,7 +56,7 @@ async function handleSubmit() {
             placeholder="如: alice"
             autocomplete="username"
           />
-          <div class="hint">注册后将获得 alice.namio.world 域名</div>
+          <div class="hint">注册后将获得 alice.nomio.world 域名</div>
         </div>
 
         <div class="form-group">

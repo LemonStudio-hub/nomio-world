@@ -10,7 +10,7 @@ import { createMockD1, createTestToken, createRequest, jsonBody, TEST_USER } fro
 
 const ENV = {
   JWT_SECRET: 'test-secret-key-for-testing',
-  ALLOWED_ORIGINS: 'https://namio.world',
+  ALLOWED_ORIGINS: 'https://nomio.world',
 } as any;
 
 function createTestApp(db: ReturnType<typeof createMockD1>) {
@@ -37,7 +37,7 @@ describe('GET /api/settings/email', () => {
     expect(res.status).toBe(200);
     const body = await res.json() as any;
     expect(body.success).toBe(true);
-    expect(body.data.email).toBe('alice@namio.world');
+    expect(body.data.email).toBe('alice@nomio.world');
     expect(body.data.quota).toBe(100 * 1024 * 1024);
   });
 

@@ -10,7 +10,9 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/dashboard',
+      name: 'Home',
+      component: () => import('@/views/LandingView.vue'),
+      meta: { guest: true },
     },
     {
       path: '/login',
@@ -51,7 +53,7 @@ router.beforeEach((to, _from, next) => {
 
   if (to.meta.requiresAuth && !auth.isLoggedIn) {
     next('/login');
-  } else if (to.meta.guest && auth.isLoggedIn) {
+  } else if (to.meta.guest && auth.isLoggedIn && to.name !== 'Home') {
     next('/dashboard');
   } else {
     next();

@@ -70,11 +70,10 @@ onMounted(async () => {
     </div>
 
     <template v-else>
-      <!-- 统计卡片 -->
       <div class="stats-grid">
         <div class="stat-card">
           <div class="label">域名</div>
-          <div class="value">{{ auth.username }}.namio.world</div>
+          <div class="value" style="font-size: 1rem">{{ auth.username }}.nomio.world</div>
         </div>
         <div class="stat-card">
           <div class="label">源站验证</div>
@@ -92,29 +91,28 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- 信息卡片 -->
       <div class="card">
         <div class="card-title">账号信息</div>
         <table>
           <tbody>
             <tr>
-              <td style="width: 140px; color: var(--color-text-secondary)">用户名</td>
+              <td style="width: 120px; color: var(--color-text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em">用户名</td>
               <td>{{ auth.username }}</td>
             </tr>
             <tr>
-              <td style="color: var(--color-text-secondary)">域名</td>
+              <td style="color: var(--color-text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em">域名</td>
               <td>
-                <a :href="`https://${auth.username}.namio.world`" target="_blank">
-                  {{ auth.username }}.namio.world
+                <a :href="`https://${auth.username}.nomio.world`" target="_blank">
+                  {{ auth.username }}.nomio.world
                 </a>
               </td>
             </tr>
             <tr>
-              <td style="color: var(--color-text-secondary)">邮箱</td>
-              <td>{{ auth.username }}@namio.world</td>
+              <td style="color: var(--color-text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em">邮箱</td>
+              <td>{{ auth.username }}@nomio.world</td>
             </tr>
             <tr>
-              <td style="color: var(--color-text-secondary)">源站</td>
+              <td style="color: var(--color-text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em">源站</td>
               <td>
                 <a v-if="domain" :href="domain.origin_url" target="_blank">
                   {{ domain.origin_url }}
@@ -122,18 +120,17 @@ onMounted(async () => {
               </td>
             </tr>
             <tr>
-              <td style="color: var(--color-text-secondary)">注册时间</td>
+              <td style="color: var(--color-text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em">注册时间</td>
               <td>{{ formatDate(auth.user?.created_at || null) }}</td>
             </tr>
             <tr>
-              <td style="color: var(--color-text-secondary)">最后登录</td>
+              <td style="color: var(--color-text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em">最后登录</td>
               <td>{{ formatDate(auth.user?.last_login_at || null) }}</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- 最近邮件 -->
       <div class="card" v-if="mailData && mailData.mails.length > 0">
         <div class="card-title">最近邮件</div>
         <div class="table-wrap">
@@ -158,8 +155,8 @@ onMounted(async () => {
             </tbody>
           </table>
         </div>
-        <div style="margin-top: 12px; text-align: right">
-          <router-link to="/mailbox" class="btn btn-outline btn-sm">查看全部 →</router-link>
+        <div style="margin-top: 16px; text-align: right">
+          <router-link to="/mailbox" class="btn btn-outline btn-sm">查看全部</router-link>
         </div>
       </div>
     </template>

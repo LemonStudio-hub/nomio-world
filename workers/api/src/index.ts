@@ -1,5 +1,5 @@
 /**
- * Namio API Worker
+ * Nomio API Worker
  * Hono 后端：认证、域名管理、邮件管理、邮箱设置
  */
 
