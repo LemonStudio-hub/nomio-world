@@ -2,13 +2,40 @@
 import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useThemeStore } from '@/stores/theme';
-import { computed } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 
 const route = useRoute();
 const auth = useAuthStore();
 const theme = useThemeStore();
 
 const isPublicPage = computed(() => route.meta.guest === true || route.name === 'Docs' || route.name === 'About');
+const isMobile = ref(false);
+const mobileMenuOpen = ref(false);
+
+// 检测是否为移动端
+function checkMobile() {
+  isMobile.value = window.innerWidth <= 768;
+}
+
+// 切换移动端菜单
+function toggleMobileMenu() {
+  mobileMenuOpen.value = !mobileMenuOpen.value;
+}
+
+// 关闭移动端菜单
+function closeMobileMenu() {
+  mobileMenuOpen.value = false;
+}
+
+// 监听窗口大小变化
+onMounted(() => {
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkMobile);
+});
 
 const navItems = [
   { path: '/dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4', label: '仪表盘' },
@@ -51,12 +78,46 @@ const bottomNavItems = [
   </div>
 
   <div v-else class="app-layout">
-    <aside class="app-sidebar">
-      <router-link to="/" class="logo-link">
+    <!-- 移动端头部 -->
+    <header v-if="isMobile" class="mobile-header">
+      <button class="mobile-menu-btn" @click="toggleMobileMenu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <router-link to="/" class="mobile-logo">
+        <span>Namio</span>.World
+      </router-link>
+      <button class="theme-toggle-mobile" @click="theme.toggle()">
+        <svg v-if="theme.isDark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- 移动端遮罩 -->
+    <div v-if="isMobile" class="mobile-overlay" :class="{ visible: mobileMenuOpen }" @click="closeMobileMenu"></div>
+
+    <!-- 侧边栏 -->
+    <aside class="app-sidebar" :class="{ open: isMobile && mobileMenuOpen }">
+      <router-link to="/" class="logo-link" @click="closeMobileMenu">
         <div class="logo"><span>Namio</span>.World</div>
       </router-link>
       <nav>
-        <router-link v-for="item in navItems" :key="item.path" :to="item.path">
+        <router-link v-for="item in navItems" :key="item.path" :to="item.path" @click="closeMobileMenu">
           <span class="nav-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path :d="item.icon" />
@@ -66,7 +127,7 @@ const bottomNavItems = [
         </router-link>
       </nav>
       <div class="nav-bottom">
-        <router-link v-for="item in bottomNavItems" :key="item.path" :to="item.path">
+        <router-link v-for="item in bottomNavItems" :key="item.path" :to="item.path" @click="closeMobileMenu">
           <span class="nav-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path :d="item.icon" />
@@ -101,16 +162,30 @@ const bottomNavItems = [
           <div class="user-avatar">{{ auth.username.charAt(0).toUpperCase() }}</div>
           <span class="username">{{ auth.username }}</span>
         </div>
-        <button class="btn btn-outline btn-sm" @click="auth.logout()">退出</button>
+        <button class="btn btn-outline btn-sm" @click="auth.logout(); closeMobileMenu()">退出</button>
       </div>
     </aside>
-    <main class="app-main">
+
+    <!-- 主内容区 -->
+    <main class="app-main" :class="{ 'has-mobile-header': isMobile }">
       <router-view v-slot="{ Component }">
         <transition name="fade-slide" mode="out-in">
           <component :is="Component" />
         </transition>
       </router-view>
     </main>
+
+    <!-- 移动端底部导航 -->
+    <nav v-if="isMobile" class="mobile-bottom-nav">
+      <router-link v-for="item in navItems.slice(0, 4)" :key="item.path" :to="item.path" class="mobile-nav-item" :class="{ active: route.path === item.path }">
+        <span class="nav-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path :d="item.icon" />
+          </svg>
+        </span>
+        <span>{{ item.label }}</span>
+      </router-link>
+    </nav>
   </div>
 </template>
 
@@ -149,6 +224,161 @@ const bottomNavItems = [
 
 .theme-toggle-float:active {
   transform: scale(0.95);
+}
+
+/* 移动端头部 */
+.mobile-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-4);
+  z-index: 998;
+}
+
+.mobile-menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: none;
+  color: var(--color-text);
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all 0.2s var(--ease);
+}
+
+.mobile-menu-btn:active {
+  background: var(--color-bg);
+  transform: scale(0.95);
+}
+
+.mobile-logo {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.mobile-logo span {
+  color: var(--color-primary);
+}
+
+.theme-toggle-mobile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all 0.2s var(--ease);
+}
+
+.theme-toggle-mobile:active {
+  background: var(--color-bg);
+  transform: scale(0.95);
+}
+
+/* 移动端遮罩 */
+.mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s var(--ease);
+}
+
+.mobile-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* 移动端侧边栏 */
+@media (max-width: 768px) {
+  .app-sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .app-sidebar.open {
+    left: 0;
+  }
+}
+
+/* 移动端主内容区 */
+.has-mobile-header {
+  margin-top: 60px;
+  padding-bottom: 80px;
+}
+
+/* 移动端底部导航 */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 998;
+  padding: 0 var(--space-2);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  color: var(--color-text-muted);
+  font-size: 0.625rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s var(--ease);
+  min-width: 60px;
+}
+
+.mobile-nav-item:active {
+  transform: scale(0.95);
+  background: var(--color-bg);
+}
+
+.mobile-nav-item.active {
+  color: var(--color-primary);
+}
+
+.mobile-nav-item .nav-icon {
+  width: 24px;
+  height: 24px;
 }
 
 .logo-link {
