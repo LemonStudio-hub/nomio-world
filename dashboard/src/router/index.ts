@@ -44,10 +44,30 @@ const router = createRouter({
       component: () => import('@/views/MailboxView.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/settings',
+      name: 'Settings',
+      component: () => import('@/views/SettingsView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/docs',
+      name: 'Docs',
+      component: () => import('@/views/DocsView.vue'),
+    },
+    {
+      path: '/about',
+      name: 'About',
+      component: () => import('@/views/AboutView.vue'),
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: () => import('@/views/NotFoundView.vue'),
+    },
   ],
 });
 
-// 导航守卫
 router.beforeEach((to, _from, next) => {
   const auth = useAuthStore();
 

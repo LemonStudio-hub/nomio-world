@@ -6,12 +6,18 @@ import { computed } from 'vue';
 const route = useRoute();
 const auth = useAuthStore();
 
-const isPublicPage = computed(() => route.meta.guest === true);
+const isPublicPage = computed(() => route.meta.guest === true || route.name === 'Docs' || route.name === 'About');
 
 const navItems = [
   { path: '/dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4', label: '仪表盘' },
   { path: '/domain', icon: 'M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9', label: '域名管理' },
   { path: '/mailbox', icon: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z', label: '邮箱' },
+  { path: '/settings', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z', label: '设置' },
+];
+
+const bottomNavItems = [
+  { path: '/docs', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253', label: '帮助' },
+  { path: '/about', icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z', label: '关于' },
 ];
 </script>
 
@@ -22,7 +28,9 @@ const navItems = [
 
   <div v-else class="app-layout">
     <aside class="app-sidebar">
-      <div class="logo"><span>Nomio</span>.World</div>
+      <router-link to="/" class="logo-link">
+        <div class="logo"><span>Namio</span>.World</div>
+      </router-link>
       <nav>
         <router-link v-for="item in navItems" :key="item.path" :to="item.path">
           <span class="nav-icon">
@@ -33,6 +41,16 @@ const navItems = [
           {{ item.label }}
         </router-link>
       </nav>
+      <div class="nav-bottom">
+        <router-link v-for="item in bottomNavItems" :key="item.path" :to="item.path">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path :d="item.icon" />
+            </svg>
+          </span>
+          {{ item.label }}
+        </router-link>
+      </div>
       <div class="user-section">
         <div class="user-info">
           <div class="user-avatar">{{ auth.username.charAt(0).toUpperCase() }}</div>
@@ -46,3 +64,34 @@ const navItems = [
     </main>
   </div>
 </template>
+
+<style scoped>
+.logo-link {
+  text-decoration: none;
+}
+.nav-bottom {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 12px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 12px;
+  margin-top: 12px;
+}
+.nav-bottom a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.nav-bottom a:hover {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+</style>
