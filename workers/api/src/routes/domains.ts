@@ -85,19 +85,9 @@ domainRoutes.post('/register', async (c) => {
   const verifyToken = crypto.randomUUID().replace(/-/g, '').substring(0, 32);
 
   // 更新用户域名信息
-  await userQueries.update(c.env.DB, user.id, {
-    origin_url: originUrl,
-    origin_host: host,
-    has_domain: 1,
-    verify_token: verifyToken,
-    verify_status: 'pending',
-  });
-
-  // 清除缓存
-  const cache = getCache(c.env);
-  if (cache) {
-    await cache.delete(cacheKeys.domain(username));
-  }
+  await c.env.DB.prepare(
+    'UPDATE users SET origin_url = ?, origin_host = ?, has_domain = 1, verify_token = ?, verify_status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
+  ).bind(originUrl, host, verifyToken, 'pending', user.id).run();
 
   return success(c, {
     originUrl,

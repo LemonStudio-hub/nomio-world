@@ -2,13 +2,13 @@
 # 从队列中消费邮件并写入D1
 name = "nomio-email"
 main = "src/consumer.ts"
-compatibility_date = "2024-01-01"
+compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
 
 [[d1_databases]]
 binding = "DB"
-database_name = "nomio-db"
-database_id = "f0616555-1157-4062-b9ef-f27d56831d02"
+database_name = "nomio-prod-db"
+database_id = "540a34d9-5d96-4bbf-8e44-00127652f032"
 
 [[queues.consumers]]
 queue = "nomio-email-queue"

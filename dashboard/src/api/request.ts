@@ -6,7 +6,7 @@
 import { ofetch } from 'ofetch';
 
 // API 基础地址
-const API_BASE = import.meta.env.VITE_API_BASE || 'https://nomio-api.lemonhub.workers.dev/api';
+const API_BASE = import.meta.env.VITE_API_BASE || 'https://api.nomio.world/api';
 
 const request = ofetch.create({
   baseURL: API_BASE,
