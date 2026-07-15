@@ -72,14 +72,22 @@ The following content is **prohibited** from being transmitted through the Servi
 ### 6.1 Service Guarantee
 
 - We strive to maintain service availability
-- We do not guarantee 100% uninterrupted service
-- Service may be suspended for maintenance or outages
+- Target availability: 99.5% (monthly)
+- Planned maintenance announced 24 hours in advance
+- Emergency maintenance excluded
 
 ### 6.2 Service Limitations
 
 - 100MB mailbox storage per user
 - 5MB maximum per email
 - Rate limiting protection
+
+### 6.3 Service Interruption
+
+If service interruption exceeds 24 hours due to our fault, we will:
+- Post notice on status page
+- Provide explanation of the interruption
+- Restore service as soon as possible
 
 ## 7. Intellectual Property
 
@@ -100,19 +108,29 @@ This project uses the **AGPL-3.0** open source license:
 
 ### 8.1 Service "As Is"
 
-The Service is provided "as is" and "as available" without any warranties, express or implied, including but not limited to:
+The Service is provided "as is" and "as available" without warranties that:
 
-- Warranties of merchantability
-- Fitness for a particular purpose
-- Non-infringement
+- The service will be uninterrupted or error-free
+- The service will meet specific requirements
+- The service will be completely secure
 
 ### 8.2 Limitation of Liability
 
-To the maximum extent permitted by applicable law, we shall not be liable for:
+To the maximum extent permitted by applicable law:
 
-- Service interruption or unavailability
-- Data loss or corruption
-- Indirect, incidental, or consequential damages
+- Our total liability shall not exceed the amount you paid in the past 12 months (this service is free, so the limit is $0)
+- We shall not be liable for:
+  - Losses caused by your violation of terms
+  - Losses caused by third parties
+  - Losses caused by force majeure
+
+### 8.3 Non-Excludable Liability
+
+We do not exclude or limit liability for:
+
+- Intentional or gross negligence
+- Breach of core obligations
+- Liabilities not permitted to be excluded by applicable law
 
 ## 9. Indemnification
 
@@ -130,15 +148,31 @@ We reserve the right to modify these Terms of Service at any time. Modified term
 
 ### 11.1 You May Terminate
 
-You may terminate your use of the Service at any time by deleting your account.
+You may terminate your use of the Service at any time by deleting your account. Before deletion, you may export your data.
 
 ### 11.2 We May Terminate
 
-We reserve the right to terminate your account in the following situations:
+We may terminate or restrict your account in the following situations:
 
-- Violation of these Terms of Service
-- Extended inactivity (90 days)
-- Abuse of system resources
+- **Terms Violation**: Serious or repeated violation of these Terms of Service
+- **Resource Abuse**: Excessive consumption of system resources affecting other users
+- **Legal Requirements**: Due to legal or regulatory requirements
+
+### 11.3 Termination Process
+
+Before termination, we will:
+
+1. **Advance Notice**: At least 7 days advance notice (except emergencies)
+2. **Reason**: Inform the reason for termination
+3. **Data Export**: Provide 30-day data export period
+4. **Appeal**: Provide appeal channel
+
+### 11.4 Inactivity Handling
+
+- 90 days inactive: Account frozen, email receiving paused
+- Reminder email sent 7 days before freezing
+- Can still login to unfreeze after freezing
+- 365 days inactive: Account may be deleted, 30 days advance notice
 
 ## 12. Governing Law
 
