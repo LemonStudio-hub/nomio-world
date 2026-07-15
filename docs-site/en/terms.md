@@ -69,12 +69,13 @@ The following content is **prohibited** from being transmitted through the Servi
 
 ## 6. Service Availability
 
-### 6.1 Service Guarantee
+### 6.1 Service Commitment
 
-- We strive to maintain service availability
-- Target availability: 99.5% (monthly)
-- Planned maintenance announced 24 hours in advance
-- Emergency maintenance excluded
+**We commit to providing at least one year of stable service from your registration date.**
+
+- Within one year: We commit to stable and available service with 99.5% target availability (monthly)
+- After one year: Due to operational uncertainties, we do not guarantee service continuity beyond one year
+- If long-term operations are planned, we will announce separately
 
 ### 6.2 Service Limitations
 
@@ -88,6 +89,13 @@ If service interruption exceeds 24 hours due to our fault, we will:
 - Post notice on status page
 - Provide explanation of the interruption
 - Restore service as soon as possible
+
+### 6.4 Data Guarantee
+
+Even if the service ceases operation, we commit to:
+- 30 days advance notice to users
+- Provide data export functionality
+- Ensure users have sufficient time to migrate
 
 ## 7. Intellectual Property
 
