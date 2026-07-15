@@ -29,22 +29,27 @@ Nomio.World is a **public digital identity infrastructure** built on Cloudflare'
 
 - **Completely Free** -- Leverages Cloudflare's free tier
 - **Edge-First** -- Routing, email processing, and data access all happen at the edge
-- **Secure by Default** -- Forced HTTPS origin, PBKDF2 password hashing, JWT authentication
-- **Anti-Abuse** -- Rate limiting, storage quotas, origin server ownership verification
-- **Email Hosting** -- Plain-text reception, auto-forwarding, built-in inbox
-- **Global Access** -- Cloudflare's edge network spans the globe
+- **Secure by Default** -- Forced HTTPS origin, PBKDF2 password hashing, JWT authentication (24-hour validity)
+- **Anti-Abuse** -- Rate limiting, storage quotas (100MB), origin server ownership verification
+- **Email Hosting** -- Email receiving, storage, search, filtering, starring, batch operations
+- **Global Access** -- Cloudflare's edge network spans 300+ global nodes
+- **Modern UI** -- Clean elegant design, dark mode, responsive layout, bilingual (CN/EN)
+- **Open Source** -- AGPL-3.0 license, completely transparent
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | Vue 3 + Vite + Pinia + Vue Router |
+| Frontend | Vue 3 + Vite + Pinia + Vue Router + vue-i18n |
 | Backend | TypeScript + Hono (Edge Web Framework) |
 | Runtime | Cloudflare Workers |
 | Database | Cloudflare D1 (Edge SQLite) |
+| Cache/Rate Limit | Cloudflare KV (optional) |
 | Email | Cloudflare Email Routing + PostalMime |
-| Testing | Vitest + Vue Test Utils |
-| Code Quality | ESLint + Prettier |
+| Security | PBKDF2 + JWT + DOMPurify + Rate Limiting |
+| Testing | Vitest + Vue Test Utils (193 tests) |
+| Documentation | VitePress (Chinese & English) |
+| Code Quality | ESLint + Prettier + TypeScript |
 
 ## Quick Start
 

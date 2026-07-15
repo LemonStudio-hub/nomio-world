@@ -7,7 +7,7 @@ Get mail list.
 ### Request
 
 ```
-GET /mails
+GET /api/mails
 ```
 
 ### Request Header
@@ -21,18 +21,17 @@ Authorization: Bearer <your-token>
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | page | number | ❌ | Page number, default 1 |
-| limit | number | ❌ | Items per page, default 20 |
-| search | string | ❌ | Search keyword |
+| limit | number | ❌ | Items per page, default 20, max 100 |
 | status | string | ❌ | Status filter |
+| search | string | ❌ | Search keyword |
 | sort_by | string | ❌ | Sort field |
 | sort_order | string | ❌ | Sort direction |
-| has_attachments | boolean | ❌ | Has attachments |
 
 ### Status Filter
 
 | Value | Description |
 |-------|-------------|
-| all | All |
+| all | All (default) |
 | unread | Unread |
 | read | Read |
 | starred | Starred |
@@ -41,7 +40,7 @@ Authorization: Bearer <your-token>
 
 | Value | Description |
 |-------|-------------|
-| received_at | Time |
+| received_at | Time (default) |
 | size | Size |
 | from_address | Sender |
 | subject | Subject |
@@ -49,7 +48,7 @@ Authorization: Bearer <your-token>
 ### Example
 
 ```bash
-curl "https://nomio-api.pages.dev/mails?page=1&limit=20&status=unread" \
+curl "https://nomio-api.pages.dev/mails?page=1&limit=20&status=unread&sort_by=received_at&sort_order=desc" \
   -H "Authorization: Bearer <your-token>"
 ```
 
@@ -65,12 +64,10 @@ curl "https://nomio-api.pages.dev/mails?page=1&limit=20&status=unread" \
         "from_address": "sender@example.com",
         "to_address": "alice@nomio.world",
         "subject": "Hello",
-        "received_at": "2024-01-15T12:00:00Z",
+        "received_at": "2026-01-15T12:00:00Z",
         "size": 1024,
         "is_read": false,
-        "is_starred": false,
-        "has_attachments": false,
-        "preview": "Hello, how are you?"
+        "is_starred": false
       }
     ],
     "pagination": {
@@ -78,17 +75,56 @@ curl "https://nomio-api.pages.dev/mails?page=1&limit=20&status=unread" \
       "limit": 20,
       "total": 100,
       "totalPages": 5
-    },
-    "stats": {
-      "total": 100,
-      "unread": 10,
-      "starred": 5,
-      "with_attachments": 20,
-      "total_size": 10485760
     }
   }
 }
 ```
+
+## Get Mail Statistics
+
+Get mail statistics.
+
+### Request
+
+```
+GET /api/mails/stats
+```
+
+### Request Header
+
+```
+Authorization: Bearer <your-token>
+```
+
+### Example
+
+```bash
+curl https://nomio-api.pages.dev/mails/stats \
+  -H "Authorization: Bearer <your-token>"
+```
+
+### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "total": 100,
+    "unread": 10,
+    "starred": 5,
+    "total_size": 10485760
+  }
+}
+```
+
+### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| total | number | Total mails |
+| unread | number | Unread mails |
+| starred | number | Starred mails |
+| total_size | number | Total size (bytes) |
 
 ## Get Mail Detail
 
@@ -97,7 +133,7 @@ Get detailed information of a single mail.
 ### Request
 
 ```
-GET /mails/:id
+GET /api/mails/:id
 ```
 
 ### Request Header
@@ -123,35 +159,19 @@ curl https://nomio-api.pages.dev/mails/1 \
     "from_address": "sender@example.com",
     "to_address": "alice@nomio.world",
     "subject": "Hello",
-    "received_at": "2024-01-15T12:00:00Z",
+    "received_at": "2026-01-15T12:00:00Z",
     "size": 1024,
     "is_read": true,
     "is_starred": false,
-    "has_attachments": true,
-    "preview": "Hello, how are you?",
     "body": "Hello, how are you?",
-    "html_body": "<p>Hello, how are you?</p>",
-    "text_body": "Hello, how are you?",
-    "message_id": "<abc123@example.com>",
-    "in_reply_to": null,
-    "references": [],
-    "user_id": 1,
-    "attachments": [
-      {
-        "filename": "document.pdf",
-        "content_type": "application/pdf",
-        "size": 102400,
-        "content_id": null
-      }
-    ],
-    "headers": {
-      "From": "sender@example.com",
-      "To": "alice@nomio.world",
-      "Subject": "Hello"
-    }
+    "html_body": "<p>Hello, how are you?</p>"
   }
 }
 ```
+
+::: tip Note
+Getting mail detail will automatically mark as read.
+:::
 
 ## Register Email
 
@@ -160,7 +180,7 @@ Register email address.
 ### Request
 
 ```
-POST /mails/register
+POST /api/mails/register
 ```
 
 ### Request Header
@@ -206,7 +226,7 @@ Mark mail as read.
 ### Request
 
 ```
-PUT /mails/:id/read
+PUT /api/mails/:id/read
 ```
 
 ### Request Header
@@ -226,7 +246,10 @@ curl -X PUT https://nomio-api.pages.dev/mails/1/read \
 
 ```json
 {
-  "success": true
+  "success": true,
+  "data": {
+    "message": "Marked as read"
+  }
 }
 ```
 
@@ -237,7 +260,7 @@ Mark mail as unread.
 ### Request
 
 ```
-PUT /mails/:id/unread
+PUT /api/mails/:id/unread
 ```
 
 ### Request Header
@@ -257,7 +280,10 @@ curl -X PUT https://nomio-api.pages.dev/mails/1/unread \
 
 ```json
 {
-  "success": true
+  "success": true,
+  "data": {
+    "message": "Marked as unread"
+  }
 }
 ```
 
@@ -268,7 +294,7 @@ Toggle mail star status.
 ### Request
 
 ```
-PUT /mails/:id/star
+PUT /api/mails/:id/star
 ```
 
 ### Request Header
@@ -302,7 +328,7 @@ Delete a single mail.
 ### Request
 
 ```
-DELETE /mails/:id
+DELETE /api/mails/:id
 ```
 
 ### Request Header
@@ -322,7 +348,10 @@ curl -X DELETE https://nomio-api.pages.dev/mails/1 \
 
 ```json
 {
-  "success": true
+  "success": true,
+  "data": {
+    "message": "Mail deleted"
+  }
 }
 ```
 
@@ -333,7 +362,7 @@ Batch delete multiple mails.
 ### Request
 
 ```
-POST /mails
+DELETE /api/mails
 ```
 
 ### Request Header
@@ -351,7 +380,7 @@ Authorization: Bearer <your-token>
 ### Example
 
 ```bash
-curl -X POST https://nomio-api.pages.dev/mails \
+curl -X DELETE https://nomio-api.pages.dev/mails \
   -H "Authorization: Bearer <your-token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -377,7 +406,7 @@ Batch mark multiple mails as read.
 ### Request
 
 ```
-PUT /mails/read
+PUT /api/mails/read
 ```
 
 ### Request Header
@@ -407,7 +436,10 @@ curl -X PUT https://nomio-api.pages.dev/mails/read \
 
 ```json
 {
-  "success": true
+  "success": true,
+  "data": {
+    "message": "Batch marked as read"
+  }
 }
 ```
 
@@ -418,7 +450,7 @@ Batch mark multiple mails as unread.
 ### Request
 
 ```
-PUT /mails/unread
+PUT /api/mails/unread
 ```
 
 ### Request Header
@@ -448,52 +480,9 @@ curl -X PUT https://nomio-api.pages.dev/mails/unread \
 
 ```json
 {
-  "success": true
-}
-```
-
-## Get Mail Statistics
-
-Get mail statistics.
-
-### Request
-
-```
-GET /mails/stats
-```
-
-### Request Header
-
-```
-Authorization: Bearer <your-token>
-```
-
-### Example
-
-```bash
-curl https://nomio-api.pages.dev/mails/stats \
-  -H "Authorization: Bearer <your-token>"
-```
-
-### Response
-
-```json
-{
   "success": true,
   "data": {
-    "total": 100,
-    "unread": 10,
-    "starred": 5,
-    "with_attachments": 20,
-    "total_size": 10485760,
-    "by_date": [
-      { "date": "2024-01-15", "count": 10 },
-      { "date": "2024-01-14", "count": 8 }
-    ],
-    "top_senders": [
-      { "address": "sender@example.com", "count": 15 },
-      { "address": "other@example.com", "count": 10 }
-    ]
+    "message": "Batch marked as unread"
   }
 }
 ```

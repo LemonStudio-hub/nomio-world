@@ -7,7 +7,7 @@
 ### 请求
 
 ```
-GET /domains
+GET /api/domains
 ```
 
 ### 请求头
@@ -31,9 +31,10 @@ curl https://nomio-api.pages.dev/domains \
   "data": {
     "username": "alice",
     "origin_url": "https://myapp.vercel.app",
-    "origin_host": "",
+    "origin_host": "myapp.vercel.app",
     "verify_status": "verified",
-    "created_at": "2024-01-01T00:00:00Z"
+    "has_domain": true,
+    "created_at": "2026-01-01T00:00:00Z"
   }
 }
 ```
@@ -46,6 +47,7 @@ curl https://nomio-api.pages.dev/domains \
 | origin_url | string | 源站地址 |
 | origin_host | string | 回源 Host |
 | verify_status | string | 验证状态 |
+| has_domain | boolean | 是否已注册域名 |
 | created_at | string | 创建时间 |
 
 ## 注册域名
@@ -55,7 +57,7 @@ curl https://nomio-api.pages.dev/domains \
 ### 请求
 
 ```
-POST /domains/register
+POST /api/domains/register
 ```
 
 ### 请求头
@@ -78,8 +80,7 @@ curl -X POST https://nomio-api.pages.dev/domains/register \
   -H "Authorization: Bearer <your-token>" \
   -H "Content-Type: application/json" \
   -d '{
-    "originUrl": "https://myapp.vercel.app",
-    "originHost": ""
+    "originUrl": "https://myapp.vercel.app"
   }'
 ```
 
@@ -90,7 +91,7 @@ curl -X POST https://nomio-api.pages.dev/domains/register \
   "success": true,
   "data": {
     "originUrl": "https://myapp.vercel.app",
-    "originHost": "",
+    "originHost": "myapp.vercel.app",
     "verifyToken": "abc123def456",
     "verifyStatus": "pending"
   }
@@ -103,8 +104,8 @@ curl -X POST https://nomio-api.pages.dev/domains/register \
 {
   "success": false,
   "error": {
-    "code": 409,
-    "message": "Domain already registered"
+    "code": "CONFLICT",
+    "message": "域名已注册"
   }
 }
 ```
@@ -116,7 +117,7 @@ curl -X POST https://nomio-api.pages.dev/domains/register \
 ### 请求
 
 ```
-PUT /domains
+PUT /api/domains
 ```
 
 ### 请求头
@@ -159,12 +160,12 @@ curl -X PUT https://nomio-api.pages.dev/domains \
 
 ## 删除域名
 
-删除域名。
+删除域名（软删除）。
 
 ### 请求
 
 ```
-DELETE /domains
+DELETE /api/domains
 ```
 
 ### 请求头
@@ -184,7 +185,10 @@ curl -X DELETE https://nomio-api.pages.dev/domains \
 
 ```json
 {
-  "success": true
+  "success": true,
+  "data": {
+    "message": "域名已删除"
+  }
 }
 ```
 
@@ -195,7 +199,7 @@ curl -X DELETE https://nomio-api.pages.dev/domains \
 ### 请求
 
 ```
-POST /domains/verify
+POST /api/domains/verify
 ```
 
 ### 请求头
@@ -203,6 +207,12 @@ POST /domains/verify
 ```
 Authorization: Bearer <your-token>
 ```
+
+### 验证机制
+
+1. 请求 `origin_url/.well-known/nomio-verify.txt`
+2. 文件内容需精确匹配 `nomio-verify={token}`
+3. 超时时间：10 秒
 
 ### 示例
 
@@ -228,8 +238,8 @@ curl -X POST https://nomio-api.pages.dev/domains/verify \
 {
   "success": false,
   "error": {
-    "code": 400,
-    "message": "Verification failed"
+    "code": "VERIFY_FAILED",
+    "message": "验证文件内容不匹配"
   }
 }
 ```

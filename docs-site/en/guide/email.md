@@ -50,6 +50,30 @@ Your email address is: `your-name@nomio.world`
 2. Click "Inbox" tab
 3. Click email to view details
 
+## Email Client
+
+Nomio.World provides professional email client features:
+
+### Mail List
+
+- Pagination display
+- Search function (search sender, subject, body)
+- Filter function (all, unread, read, starred)
+- Sort function (by time, size, sender, subject)
+
+### Mail Detail
+
+- Plain text and HTML display
+- HTML email sanitization (XSS prevention)
+- Star marking
+- Read/unread status
+
+### Batch Operations
+
+- Batch delete
+- Batch mark as read
+- Batch mark as unread
+
 ## Email Forwarding
 
 ### Configure Forwarding
@@ -86,26 +110,6 @@ You can view storage usage on the settings page:
 - Used space
 - Total quota (100MB)
 - Usage percentage
-
-## Email Management
-
-### Search Emails
-
-You can search emails on the inbox page:
-- Search sender, subject, body
-- Filter by status (all, unread, starred)
-- Sort by time, size, sender
-
-### Mark Emails
-
-- **Read/Unread** - Mark email read status
-- **Star** - Mark important emails
-
-### Delete Emails
-
-You can delete single emails or batch delete:
-- Select emails
-- Click "Delete" button
 
 ## Common Questions
 

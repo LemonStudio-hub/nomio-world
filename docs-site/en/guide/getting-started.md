@@ -1,6 +1,6 @@
 # Quick Start
 
-Get started with Nomio.World in just three steps.
+Get started with Nomio.World in just four steps.
 
 ## Step 1: Register Account
 
@@ -42,7 +42,7 @@ Your origin must:
 After registering a domain, you need to verify origin ownership:
 
 1. Create a file on your origin: `/.well-known/nomio-verify.txt`
-2. File content is the verification token shown on the page
+2. File content is the verification token shown on the page (format: `nomio-verify=xxx`)
 3. Click the "Verify Origin" button
 
 ::: tip Verification Failed?
@@ -51,7 +51,7 @@ After registering a domain, you need to verify origin ownership:
 - Ensure the origin does not redirect this path
 :::
 
-## Register Email (Optional)
+## Step 4: Register Email
 
 You can also register an email address:
 

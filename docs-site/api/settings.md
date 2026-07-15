@@ -7,7 +7,7 @@
 ### 请求
 
 ```
-GET /settings/email
+GET /api/settings/email
 ```
 
 ### 请求头
@@ -46,7 +46,7 @@ curl https://nomio-api.pages.dev/settings/email \
 | forwardEmail | string | 转发邮箱 |
 | emailEnabled | boolean | 是否启用邮箱 |
 | totalMailSize | number | 邮件总大小（字节） |
-| quota | number | 存储配额（字节） |
+| quota | number | 存储配额（字节，默认 100MB） |
 
 ## 更新邮箱设置
 
@@ -55,7 +55,7 @@ curl https://nomio-api.pages.dev/settings/email \
 ### 请求
 
 ```
-PUT /settings/email
+PUT /api/settings/email
 ```
 
 ### 请求头

@@ -13,6 +13,7 @@ Nomio.World consists of the following components:
 | Email Worker | Email receiving | Cloudflare Workers |
 | Dashboard | Frontend interface | Cloudflare Pages |
 | Database | Database | Cloudflare D1 |
+| Cache/Rate Limit | Cache and rate limiting | Cloudflare KV (optional) |
 
 ## Prerequisites
 
@@ -23,12 +24,14 @@ Need Cloudflare account and the following permissions:
 - D1
 - Pages
 - Email Routing
+- KV (optional, for cache and rate limiting)
 
 ### Development Environment
 
-- Node.js 18+
+- Node.js >= 18
 - npm or yarn
 - Git
+- Wrangler CLI
 
 ## Deployment Steps
 
@@ -65,12 +68,17 @@ wrangler d1 create nomio-db
 
 Update configuration in `workers/*/wrangler.toml`:
 - `database_id` - D1 database ID
-- `JWT_SECRET` - JWT secret
+
+Set JWT_SECRET:
+```bash
+cd workers/api
+wrangler secret put JWT_SECRET
+```
 
 ### 5. Initialize Database
 
 ```bash
-wrangler d1 execute nomio-db --file=../schema.sql
+wrangler d1 execute nomio-db --file=../../schema.sql
 ```
 
 ### 6. Deploy Workers
@@ -94,6 +102,33 @@ npm run build
 wrangler pages deploy dist --project-name=nomio-dashboard
 ```
 
+## Using Deploy Script
+
+The project provides a one-click deployment script:
+
+```bash
+# Full deployment
+./deploy.sh all
+
+# Deploy database only
+./deploy.sh db
+
+# Deploy API Worker only
+./deploy.sh api
+
+# Deploy Gateway Worker only
+./deploy.sh gateway
+
+# Deploy Email Worker only
+./deploy.sh email
+
+# Deploy Dashboard only
+./deploy.sh dashboard
+
+# Run tests
+./deploy.sh test
+```
+
 ## Configuration
 
 ### DNS Configuration
@@ -110,25 +145,45 @@ wrangler pages deploy dist --project-name=nomio-dashboard
 2. Enable Email Routing
 3. Configure Catch-all rule → Route to Email Worker
 
+### KV Namespace (Optional)
+
+For cache and rate limiting:
+
+```bash
+# Create KV namespace
+wrangler kv namespace create RATE_LIMIT_KV
+wrangler kv namespace create CACHE_KV
+
+# Update wrangler.toml
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "<your-kv-id>"
+
+[[kv_namespaces]]
+binding = "CACHE_KV"
+id = "<your-kv-id>"
+```
+
 ## Environment Variables
 
 ### API Worker
 
-| Variable | Description |
-|----------|-------------|
-| JWT_SECRET | JWT secret |
-| ALLOWED_ORIGINS | Allowed origins |
+| Variable | Description | Required |
+|----------|-------------|----------|
+| JWT_SECRET | JWT secret | ✅ |
+| ALLOWED_ORIGINS | Allowed origins (comma separated) | ✅ |
 
 ### Email Worker
 
-| Variable | Description |
-|----------|-------------|
-| MAX_MAIL_SIZE | Maximum mail size |
-| RATE_LIMIT_COUNT | Rate limit count |
-| RATE_LIMIT_WINDOW | Rate limit window |
+| Variable | Description | Default |
+|----------|-------------|---------|
+| MAX_MAIL_SIZE | Maximum mail size (bytes) | 5242880 (5MB) |
+| RATE_LIMIT_COUNT | Rate limit count | 3 |
+| RATE_LIMIT_WINDOW | Rate limit window (seconds) | 300 |
 
 ## Next Steps
 
 - [Workers Deploy](/en/deploy/workers) - Learn about Workers deployment
 - [Dashboard Deploy](/en/deploy/dashboard) - Learn about Dashboard deployment
 - [DNS Configuration](/en/deploy/dns) - Learn about DNS configuration
+- [Email Routing](/en/deploy/email-routing) - Learn about Email Routing configuration

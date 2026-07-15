@@ -7,7 +7,7 @@
 ### 请求
 
 ```
-GET /mails
+GET /api/mails
 ```
 
 ### 请求头
@@ -21,18 +21,17 @@ Authorization: Bearer <your-token>
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
 | page | number | ❌ | 页码，默认 1 |
-| limit | number | ❌ | 每页数量，默认 20 |
-| search | string | ❌ | 搜索关键词 |
+| limit | number | ❌ | 每页数量，默认 20，最大 100 |
 | status | string | ❌ | 状态筛选 |
+| search | string | ❌ | 搜索关键词 |
 | sort_by | string | ❌ | 排序字段 |
 | sort_order | string | ❌ | 排序方向 |
-| has_attachments | boolean | ❌ | 是否有附件 |
 
 ### 状态筛选
 
 | 值 | 说明 |
 |------|------|
-| all | 全部 |
+| all | 全部（默认） |
 | unread | 未读 |
 | read | 已读 |
 | starred | 星标 |
@@ -41,7 +40,7 @@ Authorization: Bearer <your-token>
 
 | 值 | 说明 |
 |------|------|
-| received_at | 时间 |
+| received_at | 时间（默认） |
 | size | 大小 |
 | from_address | 发件人 |
 | subject | 主题 |
@@ -49,7 +48,7 @@ Authorization: Bearer <your-token>
 ### 示例
 
 ```bash
-curl "https://nomio-api.pages.dev/mails?page=1&limit=20&status=unread" \
+curl "https://nomio-api.pages.dev/mails?page=1&limit=20&status=unread&sort_by=received_at&sort_order=desc" \
   -H "Authorization: Bearer <your-token>"
 ```
 
@@ -65,12 +64,10 @@ curl "https://nomio-api.pages.dev/mails?page=1&limit=20&status=unread" \
         "from_address": "sender@example.com",
         "to_address": "alice@nomio.world",
         "subject": "Hello",
-        "received_at": "2024-01-15T12:00:00Z",
+        "received_at": "2026-01-15T12:00:00Z",
         "size": 1024,
         "is_read": false,
-        "is_starred": false,
-        "has_attachments": false,
-        "preview": "Hello, how are you?"
+        "is_starred": false
       }
     ],
     "pagination": {
@@ -78,17 +75,56 @@ curl "https://nomio-api.pages.dev/mails?page=1&limit=20&status=unread" \
       "limit": 20,
       "total": 100,
       "totalPages": 5
-    },
-    "stats": {
-      "total": 100,
-      "unread": 10,
-      "starred": 5,
-      "with_attachments": 20,
-      "total_size": 10485760
     }
   }
 }
 ```
+
+## 获取邮件统计
+
+获取邮件统计信息。
+
+### 请求
+
+```
+GET /api/mails/stats
+```
+
+### 请求头
+
+```
+Authorization: Bearer <your-token>
+```
+
+### 示例
+
+```bash
+curl https://nomio-api.pages.dev/mails/stats \
+  -H "Authorization: Bearer <your-token>"
+```
+
+### 响应
+
+```json
+{
+  "success": true,
+  "data": {
+    "total": 100,
+    "unread": 10,
+    "starred": 5,
+    "total_size": 10485760
+  }
+}
+```
+
+### 响应字段
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| total | number | 邮件总数 |
+| unread | number | 未读邮件数 |
+| starred | number | 星标邮件数 |
+| total_size | number | 邮件总大小（字节） |
 
 ## 获取邮件详情
 
@@ -97,7 +133,7 @@ curl "https://nomio-api.pages.dev/mails?page=1&limit=20&status=unread" \
 ### 请求
 
 ```
-GET /mails/:id
+GET /api/mails/:id
 ```
 
 ### 请求头
@@ -123,35 +159,19 @@ curl https://nomio-api.pages.dev/mails/1 \
     "from_address": "sender@example.com",
     "to_address": "alice@nomio.world",
     "subject": "Hello",
-    "received_at": "2024-01-15T12:00:00Z",
+    "received_at": "2026-01-15T12:00:00Z",
     "size": 1024,
     "is_read": true,
     "is_starred": false,
-    "has_attachments": true,
-    "preview": "Hello, how are you?",
     "body": "Hello, how are you?",
-    "html_body": "<p>Hello, how are you?</p>",
-    "text_body": "Hello, how are you?",
-    "message_id": "<abc123@example.com>",
-    "in_reply_to": null,
-    "references": [],
-    "user_id": 1,
-    "attachments": [
-      {
-        "filename": "document.pdf",
-        "content_type": "application/pdf",
-        "size": 102400,
-        "content_id": null
-      }
-    ],
-    "headers": {
-      "From": "sender@example.com",
-      "To": "alice@nomio.world",
-      "Subject": "Hello"
-    }
+    "html_body": "<p>Hello, how are you?</p>"
   }
 }
 ```
+
+::: tip 注意
+获取邮件详情会自动标记为已读。
+:::
 
 ## 注册邮箱
 
@@ -160,7 +180,7 @@ curl https://nomio-api.pages.dev/mails/1 \
 ### 请求
 
 ```
-POST /mails/register
+POST /api/mails/register
 ```
 
 ### 请求头
@@ -206,7 +226,7 @@ curl -X POST https://nomio-api.pages.dev/mails/register \
 ### 请求
 
 ```
-PUT /mails/:id/read
+PUT /api/mails/:id/read
 ```
 
 ### 请求头
@@ -226,7 +246,10 @@ curl -X PUT https://nomio-api.pages.dev/mails/1/read \
 
 ```json
 {
-  "success": true
+  "success": true,
+  "data": {
+    "message": "已标记为已读"
+  }
 }
 ```
 
@@ -237,7 +260,7 @@ curl -X PUT https://nomio-api.pages.dev/mails/1/read \
 ### 请求
 
 ```
-PUT /mails/:id/unread
+PUT /api/mails/:id/unread
 ```
 
 ### 请求头
@@ -257,7 +280,10 @@ curl -X PUT https://nomio-api.pages.dev/mails/1/unread \
 
 ```json
 {
-  "success": true
+  "success": true,
+  "data": {
+    "message": "已标记为未读"
+  }
 }
 ```
 
@@ -268,7 +294,7 @@ curl -X PUT https://nomio-api.pages.dev/mails/1/unread \
 ### 请求
 
 ```
-PUT /mails/:id/star
+PUT /api/mails/:id/star
 ```
 
 ### 请求头
@@ -302,7 +328,7 @@ curl -X PUT https://nomio-api.pages.dev/mails/1/star \
 ### 请求
 
 ```
-DELETE /mails/:id
+DELETE /api/mails/:id
 ```
 
 ### 请求头
@@ -322,7 +348,10 @@ curl -X DELETE https://nomio-api.pages.dev/mails/1 \
 
 ```json
 {
-  "success": true
+  "success": true,
+  "data": {
+    "message": "邮件已删除"
+  }
 }
 ```
 
@@ -333,7 +362,7 @@ curl -X DELETE https://nomio-api.pages.dev/mails/1 \
 ### 请求
 
 ```
-POST /mails
+DELETE /api/mails
 ```
 
 ### 请求头
@@ -351,7 +380,7 @@ Authorization: Bearer <your-token>
 ### 示例
 
 ```bash
-curl -X POST https://nomio-api.pages.dev/mails \
+curl -X DELETE https://nomio-api.pages.dev/mails \
   -H "Authorization: Bearer <your-token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -377,7 +406,7 @@ curl -X POST https://nomio-api.pages.dev/mails \
 ### 请求
 
 ```
-PUT /mails/read
+PUT /api/mails/read
 ```
 
 ### 请求头
@@ -407,7 +436,10 @@ curl -X PUT https://nomio-api.pages.dev/mails/read \
 
 ```json
 {
-  "success": true
+  "success": true,
+  "data": {
+    "message": "已批量标记为已读"
+  }
 }
 ```
 
@@ -418,7 +450,7 @@ curl -X PUT https://nomio-api.pages.dev/mails/read \
 ### 请求
 
 ```
-PUT /mails/unread
+PUT /api/mails/unread
 ```
 
 ### 请求头
@@ -448,52 +480,9 @@ curl -X PUT https://nomio-api.pages.dev/mails/unread \
 
 ```json
 {
-  "success": true
-}
-```
-
-## 获取邮件统计
-
-获取邮件统计信息。
-
-### 请求
-
-```
-GET /mails/stats
-```
-
-### 请求头
-
-```
-Authorization: Bearer <your-token>
-```
-
-### 示例
-
-```bash
-curl https://nomio-api.pages.dev/mails/stats \
-  -H "Authorization: Bearer <your-token>"
-```
-
-### 响应
-
-```json
-{
   "success": true,
   "data": {
-    "total": 100,
-    "unread": 10,
-    "starred": 5,
-    "with_attachments": 20,
-    "total_size": 10485760,
-    "by_date": [
-      { "date": "2024-01-15", "count": 10 },
-      { "date": "2024-01-14", "count": 8 }
-    ],
-    "top_senders": [
-      { "address": "sender@example.com", "count": 15 },
-      { "address": "other@example.com", "count": 10 }
-    ]
+    "message": "已批量标记为未读"
   }
 }
 ```

@@ -29,22 +29,27 @@ Nomio.World 是一个基于 Cloudflare 边缘计算平台的**公益数字身份
 
 - **完全免费** -- 充分利用 Cloudflare 免费额度
 - **边缘优先** -- 路由、邮件处理、数据读写均在边缘节点完成
-- **安全默认** -- 强制 HTTPS 回源，PBKDF2 密码哈希，JWT 认证
-- **防滥用** -- 频率限制、存储配额、源站所有权验证
-- **邮箱托管** -- 纯文本接收、自动转发、内置收件箱
-- **全球接入** -- Cloudflare 边缘网络覆盖全球
+- **安全默认** -- 强制 HTTPS 回源，PBKDF2 密码哈希，JWT 认证（24小时有效期）
+- **防滥用** -- 速率限制、存储配额（100MB）、源站所有权验证
+- **邮箱托管** -- 邮件接收、存储、搜索、筛选、星标、批量操作
+- **全球接入** -- Cloudflare 边缘网络覆盖全球 300+ 节点
+- **现代 UI** -- 简洁优雅设计、暗色模式、响应式布局、中英双语
+- **开源透明** -- AGPL-3.0 协议，代码完全公开
 
 ## 技术栈
 
 | 层级 | 技术 |
 |------|------|
-| 前端 | Vue 3 + Vite + Pinia + Vue Router |
+| 前端 | Vue 3 + Vite + Pinia + Vue Router + vue-i18n |
 | 后端 | TypeScript + Hono（边缘 Web 框架） |
 | 运行时 | Cloudflare Workers |
 | 数据库 | Cloudflare D1（边缘 SQLite） |
+| 缓存/限速 | Cloudflare KV（可选） |
 | 邮件 | Cloudflare Email Routing + PostalMime |
-| 测试 | Vitest + Vue Test Utils |
-| 代码质量 | ESLint + Prettier |
+| 安全 | PBKDF2 + JWT + DOMPurify + 速率限制 |
+| 测试 | Vitest + Vue Test Utils（193 项测试） |
+| 文档 | VitePress（中英双语） |
+| 代码质量 | ESLint + Prettier + TypeScript |
 
 ## 快速开始
 

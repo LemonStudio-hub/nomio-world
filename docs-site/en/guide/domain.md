@@ -125,7 +125,11 @@ After modifying origin, re-verification is required.
 
 ## Delete Domain
 
-Currently, domain deletion is not supported. Please contact the administrator if needed.
+You can delete domain on the domain management page (soft delete).
+
+::: warning Note
+Deleting domain will also delete all associated emails.
+:::
 
 ## Common Questions
 

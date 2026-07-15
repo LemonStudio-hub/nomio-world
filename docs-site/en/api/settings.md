@@ -7,7 +7,7 @@ Get current user's email settings.
 ### Request
 
 ```
-GET /settings/email
+GET /api/settings/email
 ```
 
 ### Request Header
@@ -46,7 +46,7 @@ curl https://nomio-api.pages.dev/settings/email \
 | forwardEmail | string | Forward email |
 | emailEnabled | boolean | Email enabled |
 | totalMailSize | number | Total mail size (bytes) |
-| quota | number | Storage quota (bytes) |
+| quota | number | Storage quota (bytes, default 100MB) |
 
 ## Update Email Settings
 
@@ -55,7 +55,7 @@ Update email settings.
 ### Request
 
 ```
-PUT /settings/email
+PUT /api/settings/email
 ```
 
 ### Request Header

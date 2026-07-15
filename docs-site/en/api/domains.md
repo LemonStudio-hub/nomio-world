@@ -7,7 +7,7 @@ Get current user's domain information.
 ### Request
 
 ```
-GET /domains
+GET /api/domains
 ```
 
 ### Request Header
@@ -31,9 +31,10 @@ curl https://nomio-api.pages.dev/domains \
   "data": {
     "username": "alice",
     "origin_url": "https://myapp.vercel.app",
-    "origin_host": "",
+    "origin_host": "myapp.vercel.app",
     "verify_status": "verified",
-    "created_at": "2024-01-01T00:00:00Z"
+    "has_domain": true,
+    "created_at": "2026-01-01T00:00:00Z"
   }
 }
 ```
@@ -46,6 +47,7 @@ curl https://nomio-api.pages.dev/domains \
 | origin_url | string | Origin URL |
 | origin_host | string | Origin Host |
 | verify_status | string | Verify status |
+| has_domain | boolean | Has domain registered |
 | created_at | string | Created time |
 
 ## Register Domain
@@ -55,7 +57,7 @@ Register subdomain.
 ### Request
 
 ```
-POST /domains/register
+POST /api/domains/register
 ```
 
 ### Request Header
@@ -78,8 +80,7 @@ curl -X POST https://nomio-api.pages.dev/domains/register \
   -H "Authorization: Bearer <your-token>" \
   -H "Content-Type: application/json" \
   -d '{
-    "originUrl": "https://myapp.vercel.app",
-    "originHost": ""
+    "originUrl": "https://myapp.vercel.app"
   }'
 ```
 
@@ -90,7 +91,7 @@ curl -X POST https://nomio-api.pages.dev/domains/register \
   "success": true,
   "data": {
     "originUrl": "https://myapp.vercel.app",
-    "originHost": "",
+    "originHost": "myapp.vercel.app",
     "verifyToken": "abc123def456",
     "verifyStatus": "pending"
   }
@@ -103,7 +104,7 @@ curl -X POST https://nomio-api.pages.dev/domains/register \
 {
   "success": false,
   "error": {
-    "code": 409,
+    "code": "CONFLICT",
     "message": "Domain already registered"
   }
 }
@@ -116,7 +117,7 @@ Update domain configuration.
 ### Request
 
 ```
-PUT /domains
+PUT /api/domains
 ```
 
 ### Request Header
@@ -159,12 +160,12 @@ curl -X PUT https://nomio-api.pages.dev/domains \
 
 ## Delete Domain
 
-Delete domain.
+Delete domain (soft delete).
 
 ### Request
 
 ```
-DELETE /domains
+DELETE /api/domains
 ```
 
 ### Request Header
@@ -184,7 +185,10 @@ curl -X DELETE https://nomio-api.pages.dev/domains \
 
 ```json
 {
-  "success": true
+  "success": true,
+  "data": {
+    "message": "Domain deleted"
+  }
 }
 ```
 
@@ -195,7 +199,7 @@ Verify origin ownership.
 ### Request
 
 ```
-POST /domains/verify
+POST /api/domains/verify
 ```
 
 ### Request Header
@@ -203,6 +207,12 @@ POST /domains/verify
 ```
 Authorization: Bearer <your-token>
 ```
+
+### Verification Mechanism
+
+1. Request `origin_url/.well-known/nomio-verify.txt`
+2. File content must exactly match `nomio-verify={token}`
+3. Timeout: 10 seconds
 
 ### Example
 
@@ -228,8 +238,8 @@ curl -X POST https://nomio-api.pages.dev/domains/verify \
 {
   "success": false,
   "error": {
-    "code": 400,
-    "message": "Verification failed"
+    "code": "VERIFY_FAILED",
+    "message": "Verification file content does not match"
   }
 }
 ```
