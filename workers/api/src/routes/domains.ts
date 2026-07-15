@@ -207,3 +207,75 @@ domainRoutes.post('/verify', async (c) => {
     return fail(c, 'VERIFY_FAILED', '无法连接到源站', 400);
   }
 });
+
+// GET /api/domains/stats
+domainRoutes.get('/stats', async (c) => {
+  const username = getUsername(c);
+
+  // 获取用户信息
+  const user = await userQueries.findByUsername(c.env.DB, username);
+  if (!user) {
+    return fail(c, 'NOT_FOUND', '用户不存在', 404);
+  }
+
+  if (!user.has_domain) {
+    return fail(c, 'BAD_REQUEST', '尚未注册域名', 400);
+  }
+
+  // 获取域名统计信息
+  const domain = await c.env.DB.prepare(
+    'SELECT created_at, verify_status, origin_url FROM users WHERE id = ?'
+  )
+    .bind(user.id)
+    .first<{ created_at: string; verify_status: string; origin_url: string }>();
+
+  // 计算域名年龄（天）
+  const createdAt = new Date(domain?.created_at || new Date());
+  const now = new Date();
+  const ageDays = Math.floor((now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
+
+  // 获取邮箱统计
+  const mailStats = await c.env.DB.prepare(
+    'SELECT COUNT(*) as total, SUM(size) as total_size FROM mails WHERE user_id = ?'
+  )
+    .bind(user.id)
+    .first<{ total: number; total_size: number }>();
+
+  // 获取最近7天的邮件趋势
+  const mailTrend = await c.env.DB.prepare(
+    `SELECT
+      DATE(received_at) as date,
+      COUNT(*) as count
+    FROM mails
+    WHERE user_id = ? AND received_at >= datetime('now', '-7 days')
+    GROUP BY DATE(received_at)
+    ORDER BY date`
+  )
+    .bind(user.id)
+    .all<{ date: string; count: number }>();
+
+  // 获取域名状态历史（模拟数据，实际需要数据库支持）
+  const statusHistory = [
+    { status: 'registered', timestamp: domain?.created_at },
+    { status: domain?.verify_status || 'pending', timestamp: new Date().toISOString() },
+  ];
+
+  return success(c, {
+    domain: {
+      username,
+      url: `${username}.nomio.world`,
+      originUrl: domain?.origin_url,
+      verifyStatus: domain?.verify_status,
+      createdAt: domain?.created_at,
+      ageDays,
+    },
+    mail: {
+      total: mailStats?.total || 0,
+      totalSize: mailStats?.total_size || 0,
+    },
+    trend: {
+      last7Days: mailTrend.results || [],
+    },
+    statusHistory,
+  });
+});

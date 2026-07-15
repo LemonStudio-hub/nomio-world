@@ -24,8 +24,31 @@ export interface RegisterDomainData {
   verifyStatus: string;
 }
 
+export interface DomainStats {
+  domain: {
+    username: string;
+    url: string;
+    originUrl: string;
+    verifyStatus: string;
+    createdAt: string;
+    ageDays: number;
+  };
+  mail: {
+    total: number;
+    totalSize: number;
+  };
+  trend: {
+    last7Days: Array<{ date: string; count: number }>;
+  };
+  statusHistory: Array<{ status: string; timestamp: string }>;
+}
+
 export async function getDomain() {
   return request<DomainInfo>('/domains');
+}
+
+export async function getDomainStats() {
+  return request<DomainStats>('/domains/stats');
 }
 
 export async function registerDomain(params: RegisterDomainParams) {

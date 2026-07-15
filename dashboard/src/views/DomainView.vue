@@ -1,20 +1,24 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
-import { getDomain, registerDomain, updateDomain, verifyDomain } from '@/api/domains';
-import type { DomainInfo } from '@/api/domains';
+import { getDomain, getDomainStats, registerDomain, updateDomain, verifyDomain } from '@/api/domains';
+import { formatBytes, formatFullDate } from '@/utils/format';
+import type { DomainInfo, DomainStats } from '@/api/domains';
 
 const auth = useAuthStore();
 
 const domain = ref<DomainInfo | null>(null);
+const stats = ref<DomainStats | null>(null);
 const originUrl = ref('');
 const originHost = ref('');
 const loading = ref(true);
+const statsLoading = ref(false);
 const saving = ref(false);
 const verifying = ref(false);
 const registering = ref(false);
 const error = ref('');
 const successMsg = ref('');
+const activeTab = ref<'overview' | 'settings' | 'verify'>('overview');
 
 const hasDomain = computed(() => !!domain.value);
 
@@ -24,11 +28,77 @@ onMounted(async () => {
     domain.value = res.data;
     originUrl.value = res.data.origin_url;
     originHost.value = res.data.origin_host;
+
+    // 加载统计数据
+    if (domain.value) {
+      loadStats();
+    }
   } catch {
     // 用户可能还没有注册域名
   } finally {
     loading.value = false;
   }
+});
+
+async function loadStats() {
+  statsLoading.value = true;
+  try {
+    const res = await getDomainStats();
+    stats.value = res.data;
+  } catch {
+    // 静默处理
+  } finally {
+    statsLoading.value = false;
+  }
+}
+
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return '未知';
+  return formatFullDate(dateStr);
+}
+
+function getVerifyStatusColor(status: string): string {
+  switch (status) {
+    case 'verified': return 'var(--color-success)';
+    case 'failed': return 'var(--color-danger)';
+    default: return 'var(--color-warning)';
+  }
+}
+
+function getVerifyStatusText(status: string): string {
+  switch (status) {
+    case 'verified': return '已验证';
+    case 'failed': return '验证失败';
+    default: return '待验证';
+  }
+}
+
+// 计算图表数据
+const chartData = computed(() => {
+  if (!stats.value?.trend?.last7Days) return [];
+
+  const days = ['日', '一', '二', '三', '四', '五', '六'];
+  const data = stats.value.trend.last7Days;
+
+  // 填充最近7天的数据
+  const result = [];
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    const dateStr = date.toISOString().split('T')[0];
+    const dayData = data.find(d => d.date === dateStr);
+    result.push({
+      day: days[date.getDay()],
+      count: dayData?.count || 0,
+      date: dateStr,
+    });
+  }
+
+  return result;
+});
+
+const maxCount = computed(() => {
+  return Math.max(...chartData.value.map(d => d.count), 1);
 });
 
 async function handleRegister() {
@@ -54,6 +124,7 @@ async function handleRegister() {
       created_at: new Date().toISOString(),
     };
     successMsg.value = '域名注册成功，请验证源站所有权';
+    activeTab.value = 'verify';
   } catch (e: any) {
     error.value = e?.data?.error?.message || '注册失败';
   } finally {
@@ -165,83 +236,595 @@ async function handleVerify() {
         </div>
       </template>
 
-      <!-- 已注册域名时显示管理界面 -->
+      <!-- 已注册域名时显示仪表盘 -->
       <template v-else>
-        <div class="card">
-          <div class="card-title">域名信息</div>
-          <table>
-            <tbody>
-              <tr>
-                <td style="width: 120px; color: var(--color-text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em">二级域名</td>
-                <td>
-                  <a :href="`https://${auth.username}.nomio.world`" target="_blank">
+        <!-- 标签页导航 -->
+        <div class="tabs">
+          <button
+            class="tab"
+            :class="{ active: activeTab === 'overview' }"
+            @click="activeTab = 'overview'"
+          >
+            概览
+          </button>
+          <button
+            class="tab"
+            :class="{ active: activeTab === 'settings' }"
+            @click="activeTab = 'settings'"
+          >
+            设置
+          </button>
+          <button
+            class="tab"
+            :class="{ active: activeTab === 'verify' }"
+            @click="activeTab = 'verify'"
+          >
+            验证
+          </button>
+        </div>
+
+        <!-- 概览标签页 -->
+        <template v-if="activeTab === 'overview'">
+          <!-- 统计卡片 -->
+          <div class="stats-grid stagger">
+            <div class="stat-card">
+              <div class="stat-icon">🌐</div>
+              <div class="stat-content">
+                <div class="stat-value">{{ auth.username }}.nomio.world</div>
+                <div class="stat-label">域名</div>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">✅</div>
+              <div class="stat-content">
+                <div class="stat-value" :style="{ color: getVerifyStatusColor(domain?.verify_status || '') }">
+                  {{ getVerifyStatusText(domain?.verify_status || '') }}
+                </div>
+                <div class="stat-label">验证状态</div>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">📧</div>
+              <div class="stat-content">
+                <div class="stat-value">{{ stats?.mail.total || 0 }}</div>
+                <div class="stat-label">邮件数量</div>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">📊</div>
+              <div class="stat-content">
+                <div class="stat-value">{{ formatBytes(stats?.mail.totalSize || 0) }}</div>
+                <div class="stat-label">存储用量</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 域名信息卡片 -->
+          <div class="card">
+            <div class="card-title">域名信息</div>
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">域名</div>
+                <div class="info-value">
+                  <a :href="`https://${auth.username}.nomio.world`" target="_blank" class="domain-link">
                     {{ auth.username }}.nomio.world
                   </a>
-                </td>
-              </tr>
-              <tr>
-                <td style="color: var(--color-text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em">验证状态</td>
-                <td>
-                  <span v-if="domain?.verify_status === 'verified'" class="badge badge-success">已验证</span>
-                  <span v-else-if="domain?.verify_status === 'failed'" class="badge badge-danger">验证失败</span>
-                  <span v-else class="badge badge-warning">待验证</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+                </div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">源站地址</div>
+                <div class="info-value">
+                  <a :href="domain?.origin_url" target="_blank" class="origin-link">
+                    {{ domain?.origin_url }}
+                  </a>
+                </div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">注册时间</div>
+                <div class="info-value">{{ formatDate(domain?.created_at || null) }}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">域名年龄</div>
+                <div class="info-value">{{ stats?.domain.ageDays || 0 }} 天</div>
+              </div>
+            </div>
+          </div>
 
-        <div class="card">
-          <div class="card-title">源站配置</div>
-          <form @submit.prevent="handleSave">
-            <div class="form-group">
-              <label for="originUrl">源站地址</label>
-              <input
-                id="originUrl"
-                v-model="originUrl"
-                type="url"
-                placeholder="https://myapp.vercel.app"
-                class="focus-ring"
-              />
-              <div class="hint">必须以 https:// 开头，不支持 IP 地址</div>
+          <!-- 邮件趋势图表 -->
+          <div class="card">
+            <div class="card-title">最近7天邮件趋势</div>
+            <div v-if="statsLoading" class="loading-container">
+              <span class="spinner"></span>
+            </div>
+            <div v-else class="chart-container">
+              <div class="chart">
+                <div
+                  v-for="(item, index) in chartData"
+                  :key="index"
+                  class="chart-bar-wrapper"
+                >
+                  <div class="chart-bar-value">{{ item.count }}</div>
+                  <div
+                    class="chart-bar"
+                    :style="{ height: `${(item.count / maxCount) * 100}%` }"
+                  ></div>
+                  <div class="chart-bar-label">{{ item.day }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 快速操作 -->
+          <div class="card">
+            <div class="card-title">快速操作</div>
+            <div class="actions-grid">
+              <button class="action-btn" @click="activeTab = 'settings'">
+                <span class="action-icon">⚙️</span>
+                <span class="action-text">修改源站</span>
+              </button>
+              <button class="action-btn" @click="activeTab = 'verify'">
+                <span class="action-icon">🔍</span>
+                <span class="action-text">验证源站</span>
+              </button>
+              <a
+                :href="`https://${auth.username}.nomio.world`"
+                target="_blank"
+                class="action-btn"
+              >
+                <span class="action-icon">🌐</span>
+                <span class="action-text">访问网站</span>
+              </a>
+            </div>
+          </div>
+        </template>
+
+        <!-- 设置标签页 -->
+        <template v-if="activeTab === 'settings'">
+          <div class="card">
+            <div class="card-title">源站配置</div>
+            <form @submit.prevent="handleSave">
+              <div class="form-group">
+                <label for="originUrl">源站地址</label>
+                <input
+                  id="originUrl"
+                  v-model="originUrl"
+                  type="url"
+                  placeholder="https://myapp.vercel.app"
+                  class="focus-ring"
+                />
+                <div class="hint">必须以 https:// 开头，不支持 IP 地址</div>
+              </div>
+
+              <div class="form-group">
+                <label for="originHost">回源 Host</label>
+                <input
+                  id="originHost"
+                  v-model="originHost"
+                  type="text"
+                  placeholder="留空则自动使用源站域名"
+                  class="focus-ring"
+                />
+                <div class="hint">如果你的源站绑定了自定义域名，在此填写</div>
+              </div>
+
+              <button class="btn btn-primary" type="submit" :disabled="saving">
+                <span v-if="saving" class="spinner"></span>
+                <span v-else>保存配置</span>
+              </button>
+            </form>
+          </div>
+        </template>
+
+        <!-- 验证标签页 -->
+        <template v-if="activeTab === 'verify'">
+          <div class="card">
+            <div class="card-title">源站验证</div>
+            <div class="verify-status">
+              <div class="verify-icon" :style="{ color: getVerifyStatusColor(domain?.verify_status || '') }">
+                {{ domain?.verify_status === 'verified' ? '✅' : '⏳' }}
+              </div>
+              <div class="verify-info">
+                <div class="verify-text" :style="{ color: getVerifyStatusColor(domain?.verify_status || '') }">
+                  {{ getVerifyStatusText(domain?.verify_status || '') }}
+                </div>
+                <div class="verify-desc">
+                  {{ domain?.verify_status === 'verified' ? '你的源站已通过验证' : '请验证你的源站所有权' }}
+                </div>
+              </div>
             </div>
 
-            <div class="form-group">
-              <label for="originHost">回源 Host</label>
-              <input
-                id="originHost"
-                v-model="originHost"
-                type="text"
-                placeholder="留空则自动使用源站域名"
-                class="focus-ring"
-              />
-              <div class="hint">如果你的源站绑定了自定义域名，在此填写</div>
+            <div v-if="domain?.verify_status !== 'verified'" class="verify-steps">
+              <h3>验证步骤</h3>
+              <div class="step-list">
+                <div class="step">
+                  <div class="step-num">1</div>
+                  <div class="step-content">
+                    <div class="step-title">创建验证文件</div>
+                    <div class="step-desc">在你的源站创建以下文件：</div>
+                    <div class="code-block">
+                      <div class="code-label">文件路径</div>
+                      <code>/.well-known/nomio-verify.txt</code>
+                    </div>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="step-num">2</div>
+                  <div class="step-content">
+                    <div class="step-title">填写文件内容</div>
+                    <div class="step-desc">文件内容为：</div>
+                    <div class="code-block">
+                      <div class="code-label">文件内容</div>
+                      <code>nomio-verify={{ domain?.verify_status === 'verified' ? '***' : '(你的验证Token)' }}</code>
+                    </div>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="step-num">3</div>
+                  <div class="step-content">
+                    <div class="step-title">点击验证</div>
+                    <div class="step-desc">完成上述步骤后，点击下方按钮进行验证。</div>
+                  </div>
+                </div>
+              </div>
+
+              <button class="btn btn-primary" @click="handleVerify" :disabled="verifying">
+                <span v-if="verifying" class="spinner"></span>
+                <span v-else>验证源站</span>
+              </button>
             </div>
-
-            <button class="btn btn-primary" type="submit" :disabled="saving">
-              <span v-if="saving" class="spinner"></span>
-              <span v-else>保存</span>
-            </button>
-          </form>
-        </div>
-
-        <div class="card">
-          <div class="card-title">源站验证</div>
-          <p style="font-size: 0.8125rem; color: var(--color-text-secondary); margin-bottom: 16px; line-height: 1.6">
-            为防止恶意指向，需验证你对源站的所有权。请在源站部署以下验证文件：
-          </p>
-          <div class="code-block">
-            文件路径：{{ originUrl.replace(/\/$/, '') }}/.well-known/nomio-verify.txt<br />
-            文件内容：nomio-verify={{ domain?.verify_status === 'verified' ? '***' : '(注册时提供的 Token)' }}
           </div>
-          <div style="margin-top: 16px">
-            <button class="btn btn-outline" @click="handleVerify" :disabled="verifying">
-              <span v-if="verifying" class="spinner"></span>
-              <span v-else>验证源站</span>
-            </button>
-          </div>
-        </div>
+        </template>
       </template>
     </template>
   </div>
 </template>
+
+<style scoped>
+/* 统计卡片 */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s var(--ease);
+  animation: fadeInUp 0.5s var(--ease);
+  animation-fill-mode: both;
+}
+
+.stat-card:nth-child(1) { animation-delay: 0.1s; }
+.stat-card:nth-child(2) { animation-delay: 0.2s; }
+.stat-card:nth-child(3) { animation-delay: 0.3s; }
+.stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary-muted);
+}
+
+.stat-icon {
+  font-size: 2rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary-soft);
+  border-radius: var(--radius-lg);
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+/* 信息网格 */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.info-item {
+  padding: 16px;
+  background: var(--color-bg);
+  border-radius: var(--radius);
+  transition: all 0.2s var(--ease);
+}
+
+.info-item:hover {
+  background: var(--color-primary-soft);
+}
+
+.info-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.info-value {
+  font-size: 0.9375rem;
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.domain-link {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s var(--ease);
+}
+
+.domain-link:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+}
+
+.origin-link {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  word-break: break-all;
+  transition: all 0.2s var(--ease);
+}
+
+.origin-link:hover {
+  color: var(--color-primary);
+}
+
+/* 图表 */
+.chart-container {
+  padding: 20px 0;
+}
+
+.chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 200px;
+  gap: 12px;
+}
+
+.chart-bar-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  position: relative;
+}
+
+.chart-bar-value {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+}
+
+.chart-bar {
+  width: 100%;
+  max-width: 40px;
+  background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-info) 100%);
+  border-radius: var(--radius) var(--radius) 0 0;
+  transition: height 0.5s var(--ease);
+  min-height: 4px;
+  position: relative;
+}
+
+.chart-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.chart-bar-label {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+/* 操作按钮 */
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.3s var(--ease);
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.action-btn:hover {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary-muted);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.action-icon {
+  font-size: 2rem;
+}
+
+.action-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* 验证状态 */
+.verify-status {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: var(--color-bg);
+  border-radius: var(--radius-lg);
+  margin-bottom: 24px;
+}
+
+.verify-icon {
+  font-size: 2.5rem;
+}
+
+.verify-info {
+  flex: 1;
+}
+
+.verify-text {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.verify-desc {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+/* 验证步骤 */
+.verify-steps {
+  margin-top: 24px;
+}
+
+.verify-steps h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 16px;
+}
+
+.step-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.step {
+  display: flex;
+  gap: 16px;
+}
+
+.step-num {
+  width: 32px;
+  height: 32px;
+  background: var(--color-primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.step-desc {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
+}
+
+.code-block {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-top: 8px;
+}
+
+.code-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.code-block code {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.8125rem;
+  color: var(--color-primary);
+  word-break: break-all;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .actions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart {
+    height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
