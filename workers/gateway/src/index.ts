@@ -142,11 +142,19 @@ function generateSeoHtml(
 
 const app = new Hono<{ Bindings: Env }>();
 
+// 排除的子域名列表（这些子域名由其他服务处理）
+const EXCLUDED_SUBDOMAINS = ['dash', 'api', 'www', 'mail', 'smtp', 'ftp', 'admin', 'staging', 'dev', 'test'];
+
 // 通配路由：处理所有子域名请求
 app.all('*', async (c) => {
   const url = new URL(c.req.url);
   const hostname = url.hostname;
   const subdomain = hostname.split('.')[0];
+
+  // 0. 排除特殊子域名
+  if (EXCLUDED_SUBDOMAINS.includes(subdomain)) {
+    return c.text('Not Found', 404);
+  }
 
   // 1. 基本格式校验
   if (!subdomain || subdomain.length > 63) {
