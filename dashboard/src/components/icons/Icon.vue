@@ -101,5 +101,5 @@ const iconPath = computed(() => iconPaths[props.name] || '');
     stroke-linecap="round"
     stroke-linejoin="round"
     v-html="iconPath"
-  />
+  ></svg>
 </template>
