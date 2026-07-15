@@ -632,14 +632,14 @@ async function handleVerify() {
               </div>
             </div>
             <div class="stat-card">
-              <div class="stat-icon">🚫</div>
+              <div class="stat-icon"><Icon name="shield-x" :size="24" /></div>
               <div class="stat-content">
                 <div class="stat-value">{{ wafStats?.total_blocked || 0 }}</div>
                 <div class="stat-label">总拦截</div>
               </div>
             </div>
             <div class="stat-card">
-              <div class="stat-icon">📅</div>
+              <div class="stat-icon"><Icon name="calendar" :size="24" /></div>
               <div class="stat-content">
                 <div class="stat-value">{{ wafStats?.blocked_today || 0 }}</div>
                 <div class="stat-label">今日拦截</div>
@@ -690,7 +690,7 @@ async function handleVerify() {
             >
               <div class="rule-header">
                 <div class="rule-info">
-                  <span class="rule-icon">{{ WAF_RULE_TYPE_ICONS[rule.rule_type] || '🛡️' }}</span>
+                  <span class="rule-icon"><Icon :name="WAF_RULE_TYPE_ICONS[rule.rule_type] || 'shield'" :size="20" /></span>
                   <div class="rule-title">
                     <h4>{{ rule.name }}</h4>
                     <span class="rule-type-badge" :style="{ background: WAF_ACTION_COLORS[rule.action as keyof typeof WAF_ACTION_COLORS] || 'var(--color-text-muted)' }">

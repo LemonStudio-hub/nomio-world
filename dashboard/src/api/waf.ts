@@ -221,15 +221,15 @@ export const WAF_ACTION_COLORS: Record<WafAction, string> = {
 
 // 规则类型图标
 export const WAF_RULE_TYPE_ICONS: Record<WafRuleType, string> = {
-  block_ip: '🚫',
-  block_country: '🌍',
-  block_path: '📁',
-  block_user_agent: '🤖',
+  block_ip: 'shield-x',
+  block_country: 'globe',
+  block_path: 'folder',
+  block_user_agent: 'user',
   rate_limit: '⏱️',
-  geo_block: '🗺️',
-  custom_header: '📋',
-  sql_injection: '💉',
-  xss_protection: '🛡️',
-  bot_protection: '🕷️',
+  geo_block: 'map',
+  custom_header: 'document',
+  sql_injection: 'shield-alert',
+  xss_protection: 'shield',
+  bot_protection: 'scan',
   ddos_protection: '⚔️',
 };

@@ -109,10 +109,10 @@ const steps = [
 
 // 统计数据
 const stats = [
-  { value: '300+', label: '全球节点', icon: '🌍' },
+  { value: '300+', label: '全球节点', icon: 'globe' },
   { value: '<50ms', label: '响应延迟', icon: 'zap' },
   { value: '193', label: '测试用例', icon: 'check' },
-  { value: 'AGPL', label: '开源协议', icon: '📖' },
+  { value: 'AGPL', label: '开源协议', icon: 'document' },
 ];
 </script>
 
