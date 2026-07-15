@@ -25,10 +25,12 @@ export default defineConfig({
           { text: 'API', link: '/api/', activeMatch: '/api/' },
           { text: '部署', link: '/deploy/', activeMatch: '/deploy/' },
           {
-            text: 'v1.0.0',
+            text: '更多',
             items: [
               { text: '更新日志', link: '/changelog' },
               { text: '贡献指南', link: '/contributing' },
+              { text: '隐私政策', link: '/privacy' },
+              { text: '使用条款', link: '/terms' },
             ],
           },
         ],
@@ -112,10 +114,12 @@ export default defineConfig({
           { text: 'API', link: '/en/api/', activeMatch: '/en/api/' },
           { text: 'Deploy', link: '/en/deploy/', activeMatch: '/en/deploy/' },
           {
-            text: 'v1.0.0',
+            text: 'More',
             items: [
               { text: 'Changelog', link: '/en/changelog' },
               { text: 'Contributing', link: '/en/contributing' },
+              { text: 'Privacy Policy', link: '/en/privacy' },
+              { text: 'Terms of Service', link: '/en/terms' },
             ],
           },
         ],

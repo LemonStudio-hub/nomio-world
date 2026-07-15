@@ -6,12 +6,17 @@ const auth = useAuthStore();
 
 const username = ref('');
 const password = ref('');
+const agreedToTerms = ref(false);
 const error = ref('');
 
 async function handleSubmit() {
   error.value = '';
   if (!username.value || !password.value) {
     error.value = '请填写用户名和密码';
+    return;
+  }
+  if (!agreedToTerms.value) {
+    error.value = '请阅读并同意隐私政策和使用条款';
     return;
   }
   try {
@@ -55,7 +60,23 @@ async function handleSubmit() {
           />
         </div>
 
-        <button class="btn btn-primary btn-block" type="submit" :disabled="auth.loading">
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input
+              v-model="agreedToTerms"
+              type="checkbox"
+              class="checkbox-input"
+            />
+            <span class="checkbox-text">
+              我已阅读并同意
+              <router-link to="/privacy" target="_blank" class="policy-link">隐私政策</router-link>
+              和
+              <router-link to="/terms" target="_blank" class="policy-link">使用条款</router-link>
+            </span>
+          </label>
+        </div>
+
+        <button class="btn btn-primary btn-block" type="submit" :disabled="auth.loading || !agreedToTerms">
           <span v-if="auth.loading" class="spinner"></span>
           <span v-else>登录</span>
         </button>
@@ -67,3 +88,39 @@ async function handleSubmit() {
     </div>
   </div>
 </template>
+
+<style scoped>
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.checkbox-input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.checkbox-text {
+  color: var(--color-text-secondary);
+}
+
+.policy-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.policy-link:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+}
+</style>
