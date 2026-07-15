@@ -313,13 +313,6 @@ mailRoutes.put('/unread', async (c) => {
 mailRoutes.post('/register', async (c) => {
   const username = getUsername(c);
 
-  let body: { forwardEmail?: string | null };
-  try {
-    body = await c.req.json();
-  } catch {
-    body = {};
-  }
-
   const user = await userQueries.findByUsername(c.env.DB, username);
   if (!user) {
     return fail(c, 'NOT_FOUND', '用户不存在', 404);
@@ -329,23 +322,13 @@ mailRoutes.post('/register', async (c) => {
     return fail(c, 'CONFLICT', '邮箱已注册', 409);
   }
 
-  // 验证转发邮箱格式
-  if (body.forwardEmail) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(body.forwardEmail)) {
-      return fail(c, 'INVALID_INPUT', '转发邮箱格式无效', 400);
-    }
-  }
-
   await userQueries.update(c.env.DB, user.id, {
     has_email: 1,
-    forward_email: body.forwardEmail || null,
     email_enabled: 1,
   });
 
   return success(c, {
     email: `${username}@nomio.world`,
-    forwardEmail: body.forwardEmail || null,
     emailEnabled: true,
   }, 201);
 });

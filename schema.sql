@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS users (
   origin_host TEXT,                           -- 回源 Host 头
   has_domain BOOLEAN DEFAULT 0,               -- 是否已注册域名
   has_email BOOLEAN DEFAULT 0,                -- 是否已注册邮箱
-  forward_email TEXT,                         -- 外部转发邮箱（可选）
   email_enabled BOOLEAN DEFAULT 1,            -- 邮箱功能是否启用
   status TEXT DEFAULT 'active'                -- active | frozen | deleted
     CHECK (status IN ('active', 'frozen', 'deleted')),

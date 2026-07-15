@@ -5,7 +5,6 @@
  */
 
 import { Hono } from 'hono';
-import { validateEmail } from '../utils/validator';
 import { success, fail } from '../utils/response';
 import type { Env } from '../index';
 
@@ -21,7 +20,7 @@ settingsRoutes.get('/email', async (c) => {
   const username = getUsername(c);
 
   const user = await c.env.DB.prepare(
-    'SELECT username, forward_email, email_enabled, total_mail_size FROM users WHERE username = ?',
+    'SELECT username, email_enabled, total_mail_size FROM users WHERE username = ?',
   )
     .bind(username)
     .first();
@@ -32,7 +31,6 @@ settingsRoutes.get('/email', async (c) => {
 
   return success(c, {
     email: `${username}@nomio.world`,
-    forwardEmail: user.forward_email,
     emailEnabled: !!user.email_enabled,
     totalMailSize: user.total_mail_size,
     quota: 100 * 1024 * 1024, // 100MB
@@ -40,61 +38,29 @@ settingsRoutes.get('/email', async (c) => {
 });
 
 // PUT /api/settings/email
-// Body: { forwardEmail?: string | null, emailEnabled?: boolean }
+// Body: { emailEnabled?: boolean }
 settingsRoutes.put('/email', async (c) => {
   const username = getUsername(c);
 
-  let body: { forwardEmail?: string | null; emailEnabled?: boolean };
+  let body: { emailEnabled?: boolean };
   try {
     body = await c.req.json();
   } catch {
     return fail(c, 'INVALID_JSON', '请求体格式无效', 400);
   }
 
-  // 校验转发邮箱
-  if (body.forwardEmail !== undefined && body.forwardEmail !== null) {
-    if (!validateEmail(body.forwardEmail)) {
-      return fail(c, 'INVALID_INPUT', '转发邮箱格式无效', 400);
-    }
-  }
-
-  // 构建更新语句
-  const updates: string[] = [];
-  const values: unknown[] = [];
-
-  if (body.forwardEmail !== undefined) {
-    updates.push('forward_email = ?');
-    values.push(body.forwardEmail || null);
-  }
-
-  if (body.emailEnabled !== undefined) {
-    updates.push('email_enabled = ?');
-    values.push(body.emailEnabled ? 1 : 0);
-  }
-
-  if (updates.length === 0) {
+  if (body.emailEnabled === undefined) {
     return fail(c, 'INVALID_INPUT', '没有需要更新的字段', 400);
   }
 
-  updates.push('updated_at = CURRENT_TIMESTAMP');
-  values.push(username);
-
   await c.env.DB.prepare(
-    `UPDATE users SET ${updates.join(', ')} WHERE username = ?`,
+    'UPDATE users SET email_enabled = ?, updated_at = CURRENT_TIMESTAMP WHERE username = ?',
   )
-    .bind(...values)
+    .bind(body.emailEnabled ? 1 : 0, username)
     .run();
-
-  // 返回更新后的设置
-  const user = await c.env.DB.prepare(
-    'SELECT username, forward_email, email_enabled FROM users WHERE username = ?',
-  )
-    .bind(username)
-    .first();
 
   return success(c, {
     email: `${username}@nomio.world`,
-    forwardEmail: user!.forward_email,
-    emailEnabled: !!user!.email_enabled,
+    emailEnabled: body.emailEnabled,
   });
 });

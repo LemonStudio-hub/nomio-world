@@ -151,7 +151,7 @@ authRoutes.get('/me', async (c, next) => {
   const payload = c.get('jwtPayload') as { sub: string };
 
   const user = await c.env.DB.prepare(
-    `SELECT username, origin_url, origin_host, forward_email, email_enabled,
+    `SELECT username, origin_url, origin_host, email_enabled,
             status, verify_status, has_domain, has_email,
             created_at, last_login_at, total_mail_size
      FROM users WHERE username = ?`

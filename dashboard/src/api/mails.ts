@@ -74,10 +74,9 @@ export interface RegisterEmailData {
   emailEnabled: boolean;
 }
 
-export async function registerEmail(forwardEmail?: string) {
+export async function registerEmail() {
   return request<RegisterEmailData>('/mails/register', {
     method: 'POST',
-    body: { forwardEmail: forwardEmail || null },
   });
 }
 

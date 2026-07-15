@@ -41,7 +41,6 @@ const showFilters = ref(false);
 // 设置状态
 const settings = ref<EmailSettings | null>(null);
 const settingsLoading = ref(false);
-const forwardEmail = ref('');
 const emailEnabled = ref(true);
 const settingsSaved = ref(false);
 const registering = ref(false);
@@ -156,11 +155,10 @@ async function handleRegisterEmail() {
   registerError.value = '';
   registering.value = true;
   try {
-    const res = await registerEmail(forwardEmail.value || undefined);
+    const res = await registerEmail();
     hasEmail.value = true;
     settings.value = {
       email: res.data.email,
-      forwardEmail: res.data.forwardEmail,
       emailEnabled: res.data.emailEnabled,
       totalMailSize: 0,
       quota: 100 * 1024 * 1024,
@@ -317,7 +315,6 @@ async function loadSettings() {
   try {
     const res = await getEmailSettings();
     settings.value = res.data;
-    forwardEmail.value = res.data.forwardEmail || '';
     emailEnabled.value = res.data.emailEnabled;
   } catch {
     // 静默处理
@@ -329,7 +326,6 @@ async function loadSettings() {
 async function handleSaveSettings() {
   try {
     await updateEmailSettings({
-      forwardEmail: forwardEmail.value || null,
       emailEnabled: emailEnabled.value,
     });
     settingsSaved.value = true;
@@ -374,18 +370,6 @@ onMounted(() => loadMails());
           <div v-if="registerError" class="alert alert-error">{{ registerError }}</div>
 
           <form @submit.prevent="handleRegisterEmail" class="register-form">
-            <div class="form-group">
-              <label for="forwardEmail">转发邮箱（可选）</label>
-              <input
-                id="forwardEmail"
-                v-model="forwardEmail"
-                type="email"
-                placeholder="your-email@gmail.com"
-                class="focus-ring"
-              />
-              <div class="hint">收到的邮件将自动转发到此邮箱，留空则不转发</div>
-            </div>
-
             <button class="btn btn-primary btn-block" type="submit" :disabled="registering">
               <span v-if="registering" class="spinner"></span>
               <span v-else>注册邮箱</span>

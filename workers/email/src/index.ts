@@ -1,6 +1,6 @@
 /**
  * Nomio Email Worker
- * 接收入站邮件，解析纯文本，存储到 D1，可选转发
+ * 接收入站邮件，解析纯文本，存储到 D1
  */
 
 import PostalMime from 'postal-mime';
@@ -38,10 +38,10 @@ export default {
 
     // 2. 验证用户是否存在且状态正常
     const user = await env.DB.prepare(
-      'SELECT id, total_mail_size, forward_email FROM users WHERE username = ? AND status = ? AND email_enabled = 1',
+      'SELECT id, total_mail_size FROM users WHERE username = ? AND status = ? AND email_enabled = 1',
     )
       .bind(username, 'active')
-      .first<{ id: number; total_mail_size: number; forward_email: string | null }>();
+      .first<{ id: number; total_mail_size: number }>();
 
     if (!user) {
       message.setReject('User not found');
@@ -59,6 +59,7 @@ export default {
 
     // 5. 提取纯文本内容（剥离 HTML 标签与附件）
     const plainText = extractPlainText(parsed.text, parsed.html);
+    const htmlBody = parsed.html || null;
 
     // 6. 检查单封邮件大小
     const maxSize = parseInt(env.MAX_MAIL_SIZE || '5242880', 10);
@@ -79,26 +80,25 @@ export default {
 
     // 8. 存储到 D1
     const mailSize = new TextEncoder().encode(plainText).length;
+    const toAddress = parsed.to?.[0]?.address || recipient;
+
     await env.DB.batch([
       env.DB.prepare(
-        'INSERT INTO mails (user_id, message_id, from_address, subject, body, size) VALUES (?, ?, ?, ?, ?, ?)',
+        'INSERT INTO mails (user_id, message_id, from_address, to_address, subject, body, html_body, size) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
       ).bind(
         user.id,
         parsed.messageId || crypto.randomUUID(),
         fromAddress,
+        toAddress,
         parsed.subject || '(无主题)',
         plainText,
+        htmlBody,
         mailSize,
       ),
       env.DB.prepare(
         'UPDATE users SET total_mail_size = total_mail_size + ? WHERE id = ?',
       ).bind(mailSize, user.id),
     ]);
-
-    // 9. 转发至用户配置的外部邮箱（预留接口）
-    if (user.forward_email) {
-      await forwardToExternal(user.forward_email, parsed, env);
-    }
   },
 };
 
@@ -157,13 +157,4 @@ async function cleanupOldestMails(db: D1Database, userId: number, ratio: number)
     .prepare('UPDATE users SET total_mail_size = (SELECT COALESCE(SUM(size), 0) FROM mails WHERE user_id = ?) WHERE id = ?')
     .bind(userId, userId)
     .run();
-}
-
-async function forwardToExternal(
-  targetEmail: string,
-  parsed: ParsedMail,
-  _env: Env,
-): Promise<void> {
-  // TODO: 对接第三方邮件 API（如 SendGrid / Mailgun）
-  console.log(`[Forward] To: ${targetEmail}, Subject: ${parsed.subject}`);
 }

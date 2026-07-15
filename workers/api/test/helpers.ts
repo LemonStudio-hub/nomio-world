@@ -192,7 +192,6 @@ export const TEST_USER = {
   origin_host: 'alice.example.com',
   has_domain: 1,
   has_email: 1,
-  forward_email: null,
   email_enabled: 1,
   status: 'active',
   verify_token: 'test-verify-token-123',

@@ -9,7 +9,7 @@ interface MockUser {
   id: number;
   username: string;
   total_mail_size: number;
-  forward_email: string | null;
+  // forward_email removed
   status: string;
   email_enabled: number;
 }
@@ -146,7 +146,7 @@ function createMockMessage(to: string, from = 'sender@example.com') {
 describe('Email Worker - 邮件接收', () => {
   it('接受发给已注册用户的邮件', async () => {
     const env = createMockEnv([
-      { id: 1, username: 'alice', total_mail_size: 0, forward_email: null, status: 'active', email_enabled: 1 },
+      { id: 1, username: 'alice', total_mail_size: 0,  status: 'active', email_enabled: 1 },
     ]);
     const message = createMockMessage('alice@nomio.world');
     await worker.email(message, env as any, {} as any);
@@ -163,7 +163,7 @@ describe('Email Worker - 邮件接收', () => {
 
   it('拒绝发给已冻结用户的邮件', async () => {
     const env = createMockEnv([
-      { id: 1, username: 'alice', total_mail_size: 0, forward_email: null, status: 'frozen', email_enabled: 1 },
+      { id: 1, username: 'alice', total_mail_size: 0,  status: 'frozen', email_enabled: 1 },
     ]);
     const message = createMockMessage('alice@nomio.world');
     await worker.email(message, env as any, {} as any);
@@ -172,7 +172,7 @@ describe('Email Worker - 邮件接收', () => {
 
   it('拒绝发给邮箱功能关闭用户的邮件', async () => {
     const env = createMockEnv([
-      { id: 1, username: 'alice', total_mail_size: 0, forward_email: null, status: 'active', email_enabled: 0 },
+      { id: 1, username: 'alice', total_mail_size: 0,  status: 'active', email_enabled: 0 },
     ]);
     const message = createMockMessage('alice@nomio.world');
     await worker.email(message, env as any, {} as any);
@@ -181,7 +181,7 @@ describe('Email Worker - 邮件接收', () => {
 
   it('正确提取用户名（大小写不敏感）', async () => {
     const env = createMockEnv([
-      { id: 1, username: 'alice', total_mail_size: 0, forward_email: null, status: 'active', email_enabled: 1 },
+      { id: 1, username: 'alice', total_mail_size: 0,  status: 'active', email_enabled: 1 },
     ]);
     const message = createMockMessage('ALICE@nomio.world');
     await worker.email(message, env as any, {} as any);
@@ -190,7 +190,7 @@ describe('Email Worker - 邮件接收', () => {
 
   it('存储正确的邮件字段', async () => {
     const env = createMockEnv([
-      { id: 1, username: 'alice', total_mail_size: 0, forward_email: null, status: 'active', email_enabled: 1 },
+      { id: 1, username: 'alice', total_mail_size: 0,  status: 'active', email_enabled: 1 },
     ]);
     const message = createMockMessage('alice@nomio.world', 'bob@example.com');
     await worker.email(message, env as any, {} as any);
@@ -203,7 +203,7 @@ describe('Email Worker - 邮件接收', () => {
 
   it('更新用户邮件总大小', async () => {
     const env = createMockEnv([
-      { id: 1, username: 'alice', total_mail_size: 0, forward_email: null, status: 'active', email_enabled: 1 },
+      { id: 1, username: 'alice', total_mail_size: 0,  status: 'active', email_enabled: 1 },
     ]);
     const message = createMockMessage('alice@nomio.world');
     await worker.email(message, env as any, {} as any);
@@ -235,7 +235,7 @@ describe('Email Worker - 邮件接收', () => {
 describe('Email Worker - 频率限制', () => {
   it('超过频率限制的邮件被静默丢弃', async () => {
     const env = createMockEnv([
-      { id: 1, username: 'alice', total_mail_size: 0, forward_email: null, status: 'active', email_enabled: 1 },
+      { id: 1, username: 'alice', total_mail_size: 0,  status: 'active', email_enabled: 1 },
     ]);
     for (let i = 0; i < 3; i++) {
       const message = createMockMessage('alice@nomio.world', 'spammer@example.com');
@@ -251,7 +251,7 @@ describe('Email Worker - 频率限制', () => {
 describe('Email Worker - 配额清理', () => {
   it('超过配额时触发清理', async () => {
     const env = createMockEnv([
-      { id: 1, username: 'alice', total_mail_size: 100 * 1024 * 1024 + 1, forward_email: null, status: 'active', email_enabled: 1 },
+      { id: 1, username: 'alice', total_mail_size: 100 * 1024 * 1024 + 1,  status: 'active', email_enabled: 1 },
     ]);
     env.DB._getMailStore().push(
       { user_id: 1, from_address: 'a@b.com', subject: 'old', body: 'x'.repeat(1000), size: 1000 },
